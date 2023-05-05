@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -34,4 +35,7 @@ public class Orders extends GenericEntity{
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_order_status")
     private OrderStatus orderStatus;
+
+    @ManyToMany(mappedBy = "orders")
+    private List<Customer> customers;
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "customer")
 @Getter
@@ -29,4 +31,11 @@ public class Customer extends GenericEntity{
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_user")
     private User user;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "customer_orders",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "orders_id"))
+    private List<Orders> orders;
 }
