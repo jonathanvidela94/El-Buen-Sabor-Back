@@ -18,7 +18,7 @@ public class User extends GenericEntity{
     @Column(name = "password")
     private String password;
     @Column(name = "is_banned")
-    private Boolean Isbanned;
+    private Boolean isBanned;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_role")
