@@ -9,18 +9,18 @@ import lombok.Setter;
 import java.util.Date;
 
 @Entity
-@Table(name = "ingredient_cost")
+@Table(name = "item_current_stock")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IngredientCost extends GenericEntity{
-    @Column(name = "cost")
-    private Double cost;
-    @Column(name = "date")
-    private Date date;
+public class ItemCurrentStock extends GenericEntity{
+    @Column(name = "current_stock")
+    private Integer currentStock;
+    @Column(name = "current_stock_date")
+    private Date currentStockDate;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "fk_ingredient")
-    private Ingredient ingredient;
+    @JoinColumn(name = "fk_item")
+    private Item item;
 }
