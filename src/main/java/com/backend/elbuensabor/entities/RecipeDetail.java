@@ -7,16 +7,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "item_manufactured")
+@Table(name = "recipe_detail")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemManufactured extends GenericEntity{
-    @Column(name = "description")
-    private String description;
+public class RecipeDetail extends GenericEntity{
+
+    @Column(name = "quantity")
+    private Integer quantity;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_item")
     private Item item;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "fk_recipe")
+    private Recipe recipe;
 }

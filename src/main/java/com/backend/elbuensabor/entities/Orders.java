@@ -19,8 +19,8 @@ import java.util.List;
 public class Orders extends GenericEntity{
     @Column(name = "order_number")
     private Long orderNumber;
-    @Column(name = "date")
-    private LocalDateTime date;
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
     @Column(name = "estimated_time")
     private Duration estimatedTime;
 

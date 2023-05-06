@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "recipe")
 @Getter
@@ -16,7 +18,10 @@ public class Recipe extends GenericEntity{
     @Column(name = "description")
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_item_manufactured")
-    private ItemManufactured itemManufactured;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "fk_item")
+    private Item item;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    private List<RecipeDetail> recipeDetails;
 }
