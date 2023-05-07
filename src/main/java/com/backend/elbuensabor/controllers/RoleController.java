@@ -25,4 +25,6 @@ public class RoleController extends GenericControllerImpl<Role, RoleServiceImpl>
 
     //Delete @DELETE
     //http://localhost:8080/api/v1/roles/id
+
+    //Implementacion de los metodos de cada clase.
 }
