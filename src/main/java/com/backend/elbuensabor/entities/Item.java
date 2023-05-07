@@ -15,14 +15,17 @@ import lombok.Setter;
 public class Item extends GenericEntity{
     @Column(name = "name")
     private String name;
-    @Column(name = "image")
-    private String image;
-    @Column(name = "is_drink")
-    private Boolean isDrink;
     @Column(name = "is_banned")
     private Boolean isBanned;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_category")
     private Category category;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "fk_item_type")
+    private ItemType itemType;
+
+    @OneToOne(mappedBy = "item", optional = false)
+    private Recipe recipe;
 }

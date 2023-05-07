@@ -7,26 +7,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ingredient")
+@Table(name = "item_stock_config")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ingredient extends GenericEntity{
-    @Column(name = "name")
-    private String name;
+public class ItemStockConfig extends GenericEntity{
     @Column(name = "min_stock")
     private Integer minStock;
     @Column(name = "max_stock")
     private Integer maxStock;
-    @Column(name = "is_banned")
-    private Boolean isBanned;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_measurement_unit")
-    private MeasurementUnit measurementUnit;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "fk_category")
-    private Category category;
+    @JoinColumn(name = "fk_item")
+    private Item item;
 }

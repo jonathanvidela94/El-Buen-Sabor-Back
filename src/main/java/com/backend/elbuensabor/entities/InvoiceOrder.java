@@ -13,7 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceOrder extends GenericEntity{
-
     @Column(name = "invoice_number")
     private Long invoiceNumber;
 

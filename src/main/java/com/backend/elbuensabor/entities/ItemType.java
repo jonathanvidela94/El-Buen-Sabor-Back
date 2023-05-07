@@ -9,15 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "category")
+@Table(name = "item_type")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category extends GenericEntity{
+public class ItemType extends GenericEntity{
     @Column(name = "denomination")
     private String denomination;
-
-    @Column(name = "is_banned")
-    private Boolean isBaned;
 }
