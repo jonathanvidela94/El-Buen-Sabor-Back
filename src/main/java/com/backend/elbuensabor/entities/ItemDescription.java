@@ -6,21 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Entity
-@Table(name = "item_drink_cost")
+@Table(name = "item_description")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDrinkCost extends GenericEntity{
-    @Column(name = "cost")
-    private Double cost;
-    @Column(name = "date")
-    private Date date;
+public class ItemDescription extends GenericEntity{
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "fk_item_drink")
-    private ItemDrink itemDrink;
+    @JoinColumn(name = "fk_item")
+    private Item item;
 }

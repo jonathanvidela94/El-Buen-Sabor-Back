@@ -7,16 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "item_drink")
+@Table(name = "item_image")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDrink extends GenericEntity{
-    @Column(name = "min_stock")
-    private Integer minStock;
-    @Column(name = "max_stock")
-    private Integer maxStock;
+public class ItemImage extends GenericEntity{
+    @Column(name = "image")
+    private String image;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_item")
