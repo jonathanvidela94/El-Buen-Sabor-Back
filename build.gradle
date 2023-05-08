@@ -27,8 +27,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     //Lo comente por que me pide un usuario...hay que investigar que carajo pasa D:
     //Creo que es oauth2-resource-server el que esta jodiendo
-    //implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    //implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
