@@ -42,3 +42,9 @@ tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
+
+tasks.jar {enabled = true}
+
+bootJar{
+    enabled = true
+}
