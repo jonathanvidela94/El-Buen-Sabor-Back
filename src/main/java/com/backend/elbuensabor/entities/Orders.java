@@ -23,6 +23,8 @@ public class Orders extends GenericEntity{
     private LocalDateTime orderDate;
     @Column(name = "estimated_time")
     private Duration estimatedTime;
+    @Column(name = "invoice_number")
+    private Long invoiceNumber;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_delivery_type")
