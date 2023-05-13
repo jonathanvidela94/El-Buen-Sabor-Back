@@ -27,7 +27,7 @@ public class RoleController extends GenericControllerImpl<Role, RoleServiceImpl>
     //http://localhost:8080/api/v1/roles/id
 
     @Override
-    @PreAuthorize("not hasAuthority('all')")
+    @PreAuthorize("hasAuthority('all')")
     public ResponseEntity<?> getOne(Long id) {
         return super.getOne(id);
     }
