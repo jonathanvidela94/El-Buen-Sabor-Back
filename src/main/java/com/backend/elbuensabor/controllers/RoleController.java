@@ -31,7 +31,6 @@ public class RoleController extends GenericControllerImpl<Role, RoleServiceImpl>
         return super.getOne(id);
     }
 
-
     //Create @POST
     //http://localhost:8080/api/v1/roles + JSON
 
