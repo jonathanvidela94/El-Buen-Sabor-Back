@@ -24,6 +24,6 @@ public class Category extends GenericEntity{
     @JoinColumn(name = "idFatherCategory")
     private Category fatherCategory;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fatherCategory")
     private List<Category> childCategories;
 }

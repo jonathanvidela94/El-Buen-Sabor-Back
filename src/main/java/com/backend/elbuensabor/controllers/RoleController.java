@@ -22,16 +22,14 @@ public class RoleController extends GenericControllerImpl<Role, RoleServiceImpl>
         return super.getAll();
     }
 
-
     //Get One @GET
     //http://localhost:8080/api/v1/roles/id
 
     @Override
-    @PreAuthorize("not hasAuthority('all')")
+    @PreAuthorize("hasAuthority('all')")
     public ResponseEntity<?> getOne(Long id) {
         return super.getOne(id);
     }
-
 
     //Create @POST
     //http://localhost:8080/api/v1/roles + JSON
