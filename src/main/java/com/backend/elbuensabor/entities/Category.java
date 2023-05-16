@@ -1,5 +1,6 @@
 package com.backend.elbuensabor.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,5 +26,6 @@ public class Category extends GenericEntity{
     private Category fatherCategory;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "fatherCategory")
+    @JsonIgnore
     private List<Category> childCategories;
 }
