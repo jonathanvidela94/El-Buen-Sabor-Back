@@ -7,6 +7,8 @@ import com.backend.elbuensabor.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CustomerServiceImpl extends GenericServiceImpl<Customer,Long> implements CustomerService {
 
@@ -15,5 +17,10 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer,Long> imple
 
     public CustomerServiceImpl(GenericRepository<Customer, Long> genericRepository) {
         super(genericRepository);
+    }
+
+    @Override
+    public List<Customer> findAllCustomersWithDifferentRoleId(Long roleId) {
+        return customerRepository.findAllCustomersWithDifferentRoleId(roleId);
     }
 }

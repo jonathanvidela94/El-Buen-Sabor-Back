@@ -13,12 +13,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User extends GenericEntity{
-    @Column(name = "username")
-    private String username;
-    @Column(name = "password")
-    private String password;
-    @Column(name = "is_banned")
-    private Boolean isBanned;
+    @Column(name = "auth0_id")
+    private String auth0Id;
+    @Column(name = "email")
+    private String email;
+    @Column(name = "blocked")
+    private boolean blocked;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_role")

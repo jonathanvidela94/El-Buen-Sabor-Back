@@ -21,8 +21,6 @@ public class Customer extends GenericEntity{
     private String lastname;
     @Column(name = "phone")
     private String phone;
-    @Column(name = "email")
-    private String email;
     @Column(name = "address")
     private String address;
     @Column(name = "apartment")
