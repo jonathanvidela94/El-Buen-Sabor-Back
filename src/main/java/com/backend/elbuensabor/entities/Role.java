@@ -17,4 +17,6 @@ import lombok.Setter;
 public class Role extends GenericEntity{
     @Column(name = "denomination")
     private String denomination;
+    @Column(name = "auth0_rol_id")
+    private String auth0RolId;
 }
