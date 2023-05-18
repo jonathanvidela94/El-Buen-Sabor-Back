@@ -13,8 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User extends GenericEntity{
-    @Column(name = "auth0_id")
-    private String auth0Id;
     @Column(name = "email")
     private String email;
     @Column(name = "blocked")
