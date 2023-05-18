@@ -1,6 +1,6 @@
 package com.backend.elbuensabor.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,13 +19,20 @@ public class Category extends GenericEntity{
     @Column(name = "denomination")
     private String denomination;
     @Column(name = "is_banned")
-    private Boolean isBaned;
+    private Boolean isBanned;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idFatherCategory")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Category fatherCategory;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fatherCategory")
+    @OneToMany(mappedBy = "fatherCategory", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Category> childCategories;
+
+    @Transient
+    @JsonProperty("fatherCategory")
+    public Category getDirectFatherCategory() {
+        return fatherCategory;
+    }
 }

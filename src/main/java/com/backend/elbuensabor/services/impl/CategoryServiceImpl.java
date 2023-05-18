@@ -21,17 +21,17 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category,Long> imple
         super(genericRepository);
     }
 
-    @Override
-    @Transactional
-    public List<Category> findAll() throws Exception {
-        try {
-            List<Category> categories = categoryRepository.findAllByIsBanned();
-            return categories;
-        }
-        catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
+//    @Override
+//    @Transactional
+//    public List<Category> findAll() throws Exception {
+//        try {
+//            List<Category> categories = categoryRepository.findAllByIsBanned();
+//            return categories;
+//        }
+//        catch (Exception e) {
+//            throw new Exception(e.getMessage());
+//        }
+//    }
 
     @Override
     @Transactional
@@ -59,7 +59,7 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category,Long> imple
             Optional<Category> opt = this.categoryRepository.findById(id);
             if (!opt.isEmpty()) {
                 Category category = opt.get();
-                category.setIsBaned(!category.getIsBaned());
+                category.setIsBanned(!category.getIsBanned());
                 this.categoryRepository.save(category);
             }
             else {
