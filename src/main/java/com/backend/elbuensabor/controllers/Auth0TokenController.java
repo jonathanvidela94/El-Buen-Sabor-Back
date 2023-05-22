@@ -93,7 +93,7 @@ public class Auth0TokenController {
 
                 List<RoleDTO> roles = getUserRoles(userId);
 
-                UserDTO userDTO = new UserDTO(email, userId, blocked, roles);
+                UserDTO userDTO = new UserDTO(email, blocked, roles);
                 users.add(userDTO);
             }
 
@@ -192,54 +192,72 @@ public class Auth0TokenController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating new user");
         }
     }
-    @PostMapping("/users/roles")
-    public void assignRoleToUser(String userId, String roleId) {
+    @PostMapping("/users/{roleId}/roles")
+    public ResponseEntity<String> assignUserToRole(@PathVariable String roleId, @org.springframework.web.bind.annotation.RequestBody Map<String, List<String>> requestBody) {
         try {
             String token = getTokenAPI();
-            String encodedUserId = URLEncoder.encode(userId, StandardCharsets.UTF_8)
-                    .replace("|", "%7C"); // Reemplazar "|" por "%7C"
-            String url = "https://" + domain + "/api/v2/users/" + encodedUserId + "/roles/" + roleId;
+            String url = "https://" + domain + "/api/v2/roles/" + roleId + "/users";
 
             OkHttpClient client = new OkHttpClient();
 
-            // Construir el JSON para la asignación del rol
+            List<String> users = requestBody.get("users");
+
             JsonObject requestBodyObject = new JsonObject();
-            JsonArray rolesArray = new JsonArray();
-            rolesArray.add(roleId);
-            requestBodyObject.add("roles", rolesArray);
+            JsonArray usersArray = new JsonArray();
 
-            String requestBody = requestBodyObject.toString();
+            for (String user : users) {
+                usersArray.add(user);
+            }
 
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), requestBody);
+            requestBodyObject.add("users", usersArray);
+
+            String requestBodyString = requestBodyObject.toString();
+
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
+
             Request request = new Request.Builder()
                     .url(url)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
                     .post(body)
-                    .addHeader("Authorization", "Bearer " + token)
                     .build();
 
             Response response = client.newCall(request).execute();
             String responseBody = response.body().string();
 
             HttpStatus httpStatus = HttpStatus.valueOf(response.code());
-            ResponseEntity.status(httpStatus).body(responseBody);
+            return ResponseEntity.status(httpStatus).body(responseBody);
         } catch (Exception e) {
             e.printStackTrace();
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error assigning role to user");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error assigning user to role.");
         }
     }
-
-    @DeleteMapping("users/roles/delete")
-    public void deleteRoleFromUser(String userId) {
+    @DeleteMapping("/users/{userId}/roles")
+    public ResponseEntity<String> deleteRolesFromUser(@PathVariable String userId, @org.springframework.web.bind.annotation.RequestBody Map<String, List<String>> requestBody) {
         try {
             String token = getTokenAPI();
-            String encodedUserId = URLEncoder.encode(userId, StandardCharsets.UTF_8)
-                    .replace("|", "%7C"); // Reemplazar "|" por "%7C"
+            String encodedUserId = URLEncoder.encode(userId, StandardCharsets.UTF_8).replace("|", "%7C");
             String url = "https://" + domain + "/api/v2/users/" + encodedUserId + "/roles";
 
+            List<String> roles = requestBody.get("roles");
+
+            JsonObject requestBodyObject = new JsonObject();
+            JsonArray rolesArray = new JsonArray();
+
+            for (String role : roles) {
+                rolesArray.add(role);
+            }
+
+            requestBodyObject.add("roles", rolesArray);
+
+            String requestBodyString = requestBodyObject.toString();
+
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), requestBodyString);
+
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(url)
-                    .delete()
+                    .delete(body)
                     .addHeader("Authorization", "Bearer " + token)
                     .build();
 
@@ -247,11 +265,46 @@ public class Auth0TokenController {
             String responseBody = response.body().string();
 
             HttpStatus httpStatus = HttpStatus.valueOf(response.code());
-            ResponseEntity.status(httpStatus).body(responseBody);
+            return ResponseEntity.status(httpStatus).body(responseBody);
         } catch (Exception e) {
             e.printStackTrace();
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting role from user");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting roles from user");
         }
     }
+
+    @PatchMapping("/users/{id}/block")
+    public ResponseEntity<String> updateUserBlockedStatus(@PathVariable String id, @org.springframework.web.bind.annotation.RequestBody Map<String, Object> block) {
+        try {
+            String token = getTokenAPI();
+            String encodedUserId = URLEncoder.encode(id, StandardCharsets.UTF_8).replace("|", "%7C");
+            String url = "https://" + domain + "/api/v2/users/" + encodedUserId;
+
+            OkHttpClient client = new OkHttpClient();
+            boolean blocked = (boolean) block.get("blocked");
+
+            JsonObject requestBody = new JsonObject();
+            requestBody.addProperty("blocked", blocked);
+
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, requestBody.toString());
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", "Bearer " + token)
+                    .addHeader("Content-Type", "application/json")
+                    .patch(body)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String responseBody = response.body().string();
+            HttpStatus httpStatus = HttpStatus.valueOf(response.code());
+
+            return ResponseEntity.status(httpStatus).body(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user blocked status");
+        }
+    }
+
 }
 
