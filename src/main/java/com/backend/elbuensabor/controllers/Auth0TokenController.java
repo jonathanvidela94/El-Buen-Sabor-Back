@@ -271,5 +271,40 @@ public class Auth0TokenController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting roles from user");
         }
     }
+
+    @PatchMapping("/users/{id}/block")
+    public ResponseEntity<String> updateUserBlockedStatus(@PathVariable String id, @org.springframework.web.bind.annotation.RequestBody Map<String, Object> block) {
+        try {
+            String token = getTokenAPI();
+            String encodedUserId = URLEncoder.encode(id, StandardCharsets.UTF_8).replace("|", "%7C");
+            String url = "https://" + domain + "/api/v2/users/" + encodedUserId;
+
+            OkHttpClient client = new OkHttpClient();
+            boolean blocked = (boolean) block.get("blocked");
+
+            JsonObject requestBody = new JsonObject();
+            requestBody.addProperty("blocked", blocked);
+
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, requestBody.toString());
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", "Bearer " + token)
+                    .addHeader("Content-Type", "application/json")
+                    .patch(body)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String responseBody = response.body().string();
+            HttpStatus httpStatus = HttpStatus.valueOf(response.code());
+
+            return ResponseEntity.status(httpStatus).body(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user blocked status");
+        }
+    }
+
 }
 
