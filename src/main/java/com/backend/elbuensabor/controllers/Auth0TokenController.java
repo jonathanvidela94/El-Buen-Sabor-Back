@@ -21,7 +21,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/auth0")
-public class Auth0TokenController {
+public class    Auth0TokenController {
 
     @Value("${AUTH0_DOMAIN}")
     private String domain;

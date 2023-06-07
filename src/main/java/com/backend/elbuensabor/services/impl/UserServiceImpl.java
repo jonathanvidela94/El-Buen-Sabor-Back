@@ -16,7 +16,6 @@ public class UserServiceImpl extends GenericServiceImpl<User,Long> implements Us
         super(genericRepository);
     }
 
-
     @Override
     public User bloquearDesbloquearEmpleado(Long id, boolean blocked) throws Exception {
         try {

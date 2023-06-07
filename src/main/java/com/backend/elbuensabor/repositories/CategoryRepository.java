@@ -10,9 +10,4 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends GenericRepository<Category,Long>{
-    @Query(value = "SELECT * FROM category WHERE category.is_banned = false", nativeQuery = true)
-    List<Category> findAllByIsBanned();
-
-    @Query(value = "SELECT * FROM category WHERE category.id = :id AND category.is_banned = false", nativeQuery = true)
-    Optional<Category> findByIdAndIsBanned(@Param("id") Long id);
 }
