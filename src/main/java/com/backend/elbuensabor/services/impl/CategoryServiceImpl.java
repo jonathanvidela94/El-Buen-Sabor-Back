@@ -1,7 +1,6 @@
 package com.backend.elbuensabor.services.impl;
 
 import com.backend.elbuensabor.entities.Category;
-import com.backend.elbuensabor.entities.User;
 import com.backend.elbuensabor.repositories.CategoryRepository;
 import com.backend.elbuensabor.repositories.GenericRepository;
 import com.backend.elbuensabor.services.CategoryService;
@@ -17,19 +16,6 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category,Long> imple
 
     public CategoryServiceImpl(GenericRepository<Category, Long> genericRepository) {
         super(genericRepository);
-    }
-
-    @Transactional
-    @Override
-    public void saveCategoryWithParent(Category newCategory, Long parentId) throws Exception {
-        try{
-            Category parentCategory = categoryRepository.findById(parentId).orElse(null);
-            newCategory.setFatherCategory(parentCategory);
-            categoryRepository.save(newCategory);
-        }
-        catch (Exception e){
-            throw new Exception(e.getMessage());
-        }
     }
 
     @Transactional
