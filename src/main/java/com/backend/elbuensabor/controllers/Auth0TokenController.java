@@ -306,5 +306,67 @@ public class Auth0TokenController {
         }
     }
 
+    @GetMapping("/users/{id}/logins-count")
+    public ResponseEntity<String> getUserLoginsCount(@PathVariable String id){
+        try {
+            String token = getTokenAPI();
+            String encodedUserId = URLEncoder.encode(id, StandardCharsets.UTF_8).replace("|", "%7C");
+            String url = "https://" + domain + "/api/v2/users/" + encodedUserId + "?fields=logins_count";
+
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .addHeader("Authorization", "Bearer " + token)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String responseBody = response.body().string();
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(responseBody);
+            int loginsCount = jsonNode.get("logins_count").asInt();
+
+            return ResponseEntity.ok(Integer.toString(loginsCount));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @PatchMapping("/users/{id}/change-password")
+    public ResponseEntity<String> changeUserPassword(@PathVariable String id, @org.springframework.web.bind.annotation.RequestBody Map<String, Object> pass){
+        try {
+            String token = getTokenAPI();
+            String encodedUserId = URLEncoder.encode(id, StandardCharsets.UTF_8).replace("|", "%7C");
+            String url = "https://" + domain + "/api/v2/users/" + encodedUserId;
+
+            OkHttpClient client = new OkHttpClient();
+            String password = (String) pass.get("password");
+
+            JsonObject requestBody = new JsonObject();
+            requestBody.addProperty("password", password);
+
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, requestBody.toString());
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", "Bearer " + token)
+                    .addHeader("Content-Type", "application/json")
+                    .patch(body)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String responseBody = response.body().string();
+            HttpStatus httpStatus = HttpStatus.valueOf(response.code());
+
+            return ResponseEntity.status(httpStatus).body(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user paswword");
+        }
+    }
 }
 

@@ -30,7 +30,6 @@ public class UserController extends GenericControllerImpl<User, UserServiceImpl>
     //Delete @DELETE
     //http://localhost:8080/api/v1/user/id
 
-
     @PutMapping("/{id}/block")
     public ResponseEntity<?> bloquearDesbloquearEmpleado(@PathVariable Long id, @RequestParam boolean blocked) {
         try {
