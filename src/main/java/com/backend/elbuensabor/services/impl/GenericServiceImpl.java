@@ -14,7 +14,6 @@ import java.util.Optional;
 public abstract class GenericServiceImpl <E extends GenericEntity, D extends GenericDTO, ID extends Serializable> implements GenericService<E, D, ID>{
 
     protected GenericRepository<E, ID> genericRepository;
-
     protected GenericMapper<E, D> genericMapper;
 
     public GenericServiceImpl(GenericRepository<E, ID> genericRepository, GenericMapper<E, D> genericMapper){
@@ -23,7 +22,6 @@ public abstract class GenericServiceImpl <E extends GenericEntity, D extends Gen
     }
 
     @Override
-    @Transactional
     public List<D> findAll() throws Exception {
         try{
             List<E> entities = genericRepository.findAll();
@@ -35,7 +33,6 @@ public abstract class GenericServiceImpl <E extends GenericEntity, D extends Gen
     }
 
     @Override
-    @Transactional
     public D findById(ID id) throws Exception {
         try{
             E entity = genericRepository.findById(id).get();

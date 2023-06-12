@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDTO, Long> implements CategoryService {
 
@@ -22,15 +24,56 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
         super(genericRepository, genericMapper);
     }
 
-    @Transactional
     @Override
-    public Category lockUnlockCategory(Long id, boolean blocked) throws Exception {
+    @Transactional
+    public Category saveCategory(CategoryDTO dto) throws Exception {
         try {
-            Category category = categoryRepository.findById(id).orElseThrow(() -> new Exception("Category not found"));
-            category.setIsBanned(blocked);
+            Category category = categoryMapper.toEntity(dto);
+
+            if(dto.getCategoryFatherId() != null) {
+               if(categoryRepository.existsById(dto.getCategoryFatherId())) {
+                   Category fatherCategory = categoryRepository.findById(dto.getCategoryFatherId()).get();
+                   category.setFatherCategory(fatherCategory);
+               } else {
+                   throw new Exception("La categoría padre no existe");
+               }
+            }
+
             return categoryRepository.save(category);
-        }catch (Exception e){
-            throw  new Exception(e.getMessage());
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+
+
+    }
+
+    @Override
+    @Transactional
+    public Category updateCategory(Long id, CategoryDTO dto) throws Exception {
+        try {
+            Optional<Category> optionalCategory = categoryRepository.findById(id);
+
+            if (optionalCategory.isEmpty()) {
+                throw new Exception("La categoria a actualizar no existe.");
+            }
+
+            Category category = optionalCategory.get();
+
+            if (dto.getCategoryFatherId() != null) {
+                if(categoryRepository.existsById(dto.getCategoryFatherId())){
+                    Category categoryFather = categoryRepository.findById(dto.getCategoryFatherId()).get();
+                    category.setFatherCategory(categoryFather);
+                }
+                else {
+                    throw new Exception("La categoria padre no existe");
+                }
+            } else {
+                category.setFatherCategory(null);
+            }
+            category.setDenomination(dto.getDenomination());
+            return categoryRepository.save(category);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 

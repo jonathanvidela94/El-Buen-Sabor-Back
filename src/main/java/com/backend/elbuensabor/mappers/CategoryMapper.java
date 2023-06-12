@@ -1,6 +1,5 @@
 package com.backend.elbuensabor.mappers;
 
-
 import com.backend.elbuensabor.DTO.CategoryDTO;
 import com.backend.elbuensabor.entities.Category;
 import org.mapstruct.Mapper;
@@ -14,16 +13,11 @@ public interface CategoryMapper extends GenericMapper<Category, CategoryDTO> {
         return Mappers.getMapper(CategoryMapper.class);
     }
 
-    @Override
-    @Mapping(source = "denomination", target = "denomination")
-    @Mapping(source = "isBanned", target = "isBanned")
-    @Mapping(source = "fatherCategory.id", target = "categoryFatherId")
+    @Mapping(source = "source.fatherCategory.id", target = "categoryFatherId")
     CategoryDTO toDTO(Category source);
 
-    @Override
-    @Mapping(source = "denomination", target = "denomination")
-    @Mapping(source = "isBanned", target = "isBanned")
-    @Mapping(source = "categoryFatherId", target = "fatherCategory.id")
+    @Mapping(target = "fatherCategory", ignore = true)
+    @Mapping(target = "childCategories", ignore = true)
     Category toEntity(CategoryDTO source);
 
 }

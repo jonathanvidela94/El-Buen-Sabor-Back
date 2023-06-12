@@ -9,6 +9,6 @@ public class CategoryDTO extends GenericDTO{
 
     private Boolean isBanned;
 
-    private Long CategoryFatherId;
+    private Long categoryFatherId;
 
 }
