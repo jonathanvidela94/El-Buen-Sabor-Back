@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -71,6 +72,7 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
                 category.setFatherCategory(null);
             }
             category.setDenomination(dto.getDenomination());
+            category.setBlocked(dto.getBlocked());
             return categoryRepository.save(category);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -82,6 +84,26 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
             Category category = categoryRepository.findById(id).orElseThrow(() -> new Exception("Category not found"));
             category.setBlocked(blocked);
             return categoryRepository.save(category);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public List<CategoryDTO>findUnlockedCategories() throws Exception{
+        try {
+            List<Category> categories = categoryRepository.findUnlockedCategories();
+            return genericMapper.toDTOsList(categories);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public List<CategoryDTO>findUnlockedCategoriesExceptId(Long id) throws Exception{
+        try {
+            List<Category> categories = categoryRepository.findUnlockedCategoriesExceptId(id);
+            return genericMapper.toDTOsList(categories);
         }
         catch (Exception e) {
             throw new Exception(e.getMessage());
