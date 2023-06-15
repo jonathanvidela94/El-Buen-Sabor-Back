@@ -7,8 +7,10 @@ public class CategoryDTO extends GenericDTO{
 
     private String denomination;
 
-    private Boolean isBanned;
+    private Boolean blocked;
 
     private Long categoryFatherId;
+
+    private String categoryFatherDenomination;
 
 }

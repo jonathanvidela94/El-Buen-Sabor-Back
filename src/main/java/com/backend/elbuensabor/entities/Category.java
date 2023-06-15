@@ -19,8 +19,8 @@ import java.util.List;
 public class Category extends GenericEntity{
     @Column(name = "denomination")
     private String denomination;
-    @Column(name = "is_banned")
-    private Boolean isBanned;
+    @Column(name = "blocked")
+    private Boolean blocked;
 
     @ManyToOne
     @JoinColumn(name = "idFatherCategory")

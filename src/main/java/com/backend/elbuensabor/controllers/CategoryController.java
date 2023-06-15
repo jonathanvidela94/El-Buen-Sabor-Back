@@ -36,4 +36,14 @@ public class CategoryController extends GenericControllerImpl<Category, Category
         }
     }
 
+    @PutMapping("/{id}/block")
+    public ResponseEntity<?> blockUnlockCategory(@PathVariable Long id, @RequestParam boolean blocked) {
+        try {
+            Category category = service.blockUnlockCategory(id, blocked);
+            return ResponseEntity.status(HttpStatus.OK).body(category);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
 }
