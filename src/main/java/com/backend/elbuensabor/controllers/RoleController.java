@@ -16,5 +16,4 @@ public class RoleController extends GenericControllerImpl<Role, RoleDTO> {
 
     @Autowired
     private RoleService service;
-
 }
