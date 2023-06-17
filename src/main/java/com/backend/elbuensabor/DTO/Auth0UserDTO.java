@@ -13,5 +13,5 @@ public class Auth0UserDTO {
     private String email;
     private String password;
     private boolean blocked;
-    private List<RoleDTO> roles;
+    private List<Auth0RoleDTO> roles;
 }
