@@ -78,7 +78,8 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
             throw new Exception(e.getMessage());
         }
     }
-
+    @Override
+    @Transactional
     public Category blockUnlockCategory(Long id, boolean blocked) throws Exception{
         try {
             Category category = categoryRepository.findById(id).orElseThrow(() -> new Exception("Category not found"));
