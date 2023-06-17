@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDTO, Long> implements CustomerService {
@@ -44,5 +45,4 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDT
             throw new Exception(e.getMessage());
         }
     }
-
 }

@@ -39,5 +39,4 @@ public class CustomerController extends GenericControllerImpl<Customer, Customer
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
         }
     }
-
 }
