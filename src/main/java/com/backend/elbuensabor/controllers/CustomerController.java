@@ -7,7 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -15,7 +19,6 @@ import java.util.List;
 public class CustomerController extends GenericControllerImpl<Customer, CustomerServiceImpl> {
 
     private static final String ERROR_MESSAGE = "{\"error\":\"Error. Por favor intente nuevamente.\"}";
-
 
     //Get All @GET
     //http://localhost:8080/api/v1/customers
@@ -42,4 +45,14 @@ public class CustomerController extends GenericControllerImpl<Customer, Customer
         }
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<?> findCustomerByUserAuth0Id(@RequestParam String auth0Id) {
+        try {
+            String decodedAuth0Id = URLDecoder.decode(auth0Id, StandardCharsets.UTF_8);
+            Optional<Customer> customer = service.findCustomerByUserAuth0Id(decodedAuth0Id);
+            return ResponseEntity.status(HttpStatus.OK).body(customer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
+        }
+    }
 }
