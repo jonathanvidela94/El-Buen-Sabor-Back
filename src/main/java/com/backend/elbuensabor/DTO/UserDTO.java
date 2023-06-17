@@ -1,16 +1,16 @@
 package com.backend.elbuensabor.DTO;
 
-import lombok.AllArgsConstructor;
+import com.backend.elbuensabor.entities.Role;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserDTO {
+public class UserDTO extends GenericDTO{
+
+    private String auth0Id;
+
     private String email;
+
     private boolean blocked;
-    private List<RoleDTO> roles;
+
+    private Role role;
 }

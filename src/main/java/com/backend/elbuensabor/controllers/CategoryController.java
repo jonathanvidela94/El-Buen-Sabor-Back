@@ -18,6 +18,7 @@ public class CategoryController extends GenericControllerImpl<Category, Category
     private CategoryService service;
     private static final String ERROR_MESSAGE = "{\"error\":\"Error. Por favor intente nuevamente.\"}";
 
+    @Override
     @PostMapping(value = "")
     public ResponseEntity<?> save(@RequestBody CategoryDTO dto) {
         try {
@@ -27,6 +28,7 @@ public class CategoryController extends GenericControllerImpl<Category, Category
         }
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody CategoryDTO dto) {
         try {

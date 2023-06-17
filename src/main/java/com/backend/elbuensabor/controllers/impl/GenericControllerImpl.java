@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-public abstract class GenericControllerImpl<E extends GenericEntity, D extends GenericDTO> implements GenericController<E, Long> {
+public abstract class GenericControllerImpl<E extends GenericEntity, D extends GenericDTO> implements GenericController<E, D, Long> {
 
     @Autowired
     protected GenericService<E, D, Long> service;
@@ -32,6 +32,26 @@ public abstract class GenericControllerImpl<E extends GenericEntity, D extends G
             return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
+        }
+    }
+
+    @Override
+    @PostMapping("")
+    public ResponseEntity<?> save(D dto) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.save(dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
+    @Override
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody D dto) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.update(id, dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }
     }
 
