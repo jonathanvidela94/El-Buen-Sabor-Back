@@ -108,31 +108,6 @@ public class Auth0TokenController {
         }
     }
 
-    public List<RoleDTO> getAvailableRoles() {
-        try {
-            String token = getTokenAPI();
-            String url = "https://" + domain + "/api/v2/roles";
-
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .get()
-                    .addHeader("Authorization", "Bearer " + token)
-                    .build();
-
-            Response response = client.newCall(request).execute();
-            String responseBody = response.body().string();
-
-            ObjectMapper mapper = new ObjectMapper();
-            RoleDTO[] roles = mapper.readValue(responseBody, RoleDTO[].class);
-
-            return Arrays.asList(roles);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-    }
-
     @GetMapping("users/{id}/roles")
     public List<RoleDTO> getUserRoles(@PathVariable("id") String userId) {
         try {
@@ -333,7 +308,6 @@ public class Auth0TokenController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
     @PatchMapping("/users/{id}/change-password")
     public ResponseEntity<String> changeUserPassword(@PathVariable String id, @org.springframework.web.bind.annotation.RequestBody Map<String, Object> pass){
