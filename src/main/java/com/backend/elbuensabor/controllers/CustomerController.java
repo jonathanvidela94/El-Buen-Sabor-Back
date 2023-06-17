@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/customers")
@@ -22,6 +25,16 @@ public class CustomerController extends GenericControllerImpl<Customer, Customer
     public ResponseEntity<?> findAllCustomersWithDifferentRoleId(@PathVariable Long roleId) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.findAllCustomersWithDifferentRoleId(roleId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
+        }
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> findCustomerByUserAuth0Id(@RequestParam String auth0Id) {
+        try {
+            String decodedAuth0Id = URLDecoder.decode(auth0Id, StandardCharsets.UTF_8);
+            return ResponseEntity.status(HttpStatus.OK).body(service.findCustomerByUserAuth0Id(decodedAuth0Id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
         }

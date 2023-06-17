@@ -33,4 +33,16 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDT
             throw new Exception(e.getMessage());
         }
     }
+
+    @Override
+    public CustomerDTO findCustomerByUserAuth0Id(String auth0Id) throws Exception{
+        try {
+            Customer customer = customerRepository.findCustomerByUserAuth0Id(auth0Id);
+            return customerMapper.toDTO(customer);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }
