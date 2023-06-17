@@ -1,45 +1,42 @@
 package com.backend.elbuensabor.controllers;
 
+import com.backend.elbuensabor.DTO.CustomerDTO;
 import com.backend.elbuensabor.controllers.impl.GenericControllerImpl;
 import com.backend.elbuensabor.entities.Customer;
-import com.backend.elbuensabor.services.impl.CustomerServiceImpl;
+import com.backend.elbuensabor.services.CustomerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/customers")
-public class CustomerController extends GenericControllerImpl<Customer, CustomerServiceImpl> {
+public class CustomerController extends GenericControllerImpl<Customer, CustomerDTO> {
 
+    @Autowired
+    private CustomerService service;
     private static final String ERROR_MESSAGE = "{\"error\":\"Error. Por favor intente nuevamente.\"}";
-
-
-    //Get All @GET
-    //http://localhost:8080/api/v1/customers
-
-    //Get One @GET
-    //http://localhost:8080/api/v1/customers/id
-
-    //Create @POST
-    //http://localhost:8080/api/v1/customers + JSON
-
-    //Update @PUT
-    //http://localhost:8080/api/v1/customers/id + JSON
-
-    //Delete @DELETE
-    //http://localhost:8080/api/v1/customers/id
 
     @GetMapping("/different-role/{roleId}")
     public ResponseEntity<?> findAllCustomersWithDifferentRoleId(@PathVariable Long roleId) {
         try {
-            List<Customer> customers = service.findAllCustomersWithDifferentRoleId(roleId);
-            return ResponseEntity.status(HttpStatus.OK).body(customers);
+            return ResponseEntity.status(HttpStatus.OK).body(service.findAllCustomersWithDifferentRoleId(roleId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
         }
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<?> findCustomerByUserAuth0Id(@RequestParam String auth0Id) {
+        try {
+            String decodedAuth0Id = URLDecoder.decode(auth0Id, StandardCharsets.UTF_8);
+            return ResponseEntity.status(HttpStatus.OK).body(service.findCustomerByUserAuth0Id(decodedAuth0Id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
+        }
+    }
 }

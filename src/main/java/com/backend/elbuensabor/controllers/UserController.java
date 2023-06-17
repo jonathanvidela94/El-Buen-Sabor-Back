@@ -1,8 +1,10 @@
 package com.backend.elbuensabor.controllers;
 
+import com.backend.elbuensabor.DTO.UserDTO;
 import com.backend.elbuensabor.controllers.impl.GenericControllerImpl;
 import com.backend.elbuensabor.entities.User;
-import com.backend.elbuensabor.services.impl.UserServiceImpl;
+import com.backend.elbuensabor.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,26 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/user")
-public class UserController extends GenericControllerImpl<User, UserServiceImpl> {
+public class UserController extends GenericControllerImpl<User, UserDTO> {
 
+    @Autowired
+    private UserService service;
     private static final String ERROR_MESSAGE = "{\"error\":\"Error. Por favor intente nuevamente.\"}";
-
-
-    //Get All @GET
-    //http://localhost:8080/api/v1/user
-
-    //Get One @GET
-    //http://localhost:8080/api/v1/user/id
-
-    //Create @POST
-    //http://localhost:8080/api/v1/user + JSON
-
-    //Update @PUT
-    //http://localhost:8080/api/v1/user/id + JSON
-
-    //Delete @DELETE
-    //http://localhost:8080/api/v1/user/id
-
 
     @PutMapping("/{id}/block")
     public ResponseEntity<?> bloquearDesbloquearEmpleado(@PathVariable Long id, @RequestParam boolean blocked) {

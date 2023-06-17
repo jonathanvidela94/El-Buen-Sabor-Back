@@ -6,8 +6,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Repository
 public interface CategoryRepository extends GenericRepository<Category,Long>{
+    @Query (value = "SELECT * FROM category WHERE blocked = false", nativeQuery = true)
+    List<Category> findUnlockedCategories();
+    @Query (value = "SELECT * FROM category WHERE blocked = false AND id != :id", nativeQuery = true)
+    List<Category> findUnlockedCategoriesExceptId(@Param("id") Long id);
 }
