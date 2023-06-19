@@ -104,6 +104,10 @@ public class    Auth0TokenController {
             userObject.addProperty("password", newUser.getPassword());
             userObject.addProperty("blocked", newUser.isBlocked());
 
+            JsonObject appMetadata = new JsonObject();
+            appMetadata.addProperty("isManualCreation", true);
+            userObject.add("app_metadata", appMetadata);
+
             String requestBody = userObject.toString();
             OkHttpClient client = new OkHttpClient();
             RequestBody body = RequestBody.create(MediaType.parse("application/json"), requestBody);
