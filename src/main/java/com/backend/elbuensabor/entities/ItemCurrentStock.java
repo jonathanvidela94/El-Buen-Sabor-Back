@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "item_current_stock")
@@ -18,7 +18,7 @@ public class ItemCurrentStock extends GenericEntity{
     @Column(name = "current_stock")
     private Integer currentStock;
     @Column(name = "current_stock_date")
-    private Date currentStockDate;
+    private LocalDateTime currentStockDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_item")

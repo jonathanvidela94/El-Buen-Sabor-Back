@@ -13,4 +13,7 @@ public class ItemDTO extends GenericDTO{
     private Long measurementUnitId;
     private String measurementDenomination;
     private Integer currentStock;
+    private Double costPrice;
+    private Integer minStock;
+    private Integer maxStock;
 }
