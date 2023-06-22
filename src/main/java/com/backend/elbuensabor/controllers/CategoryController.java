@@ -48,19 +48,19 @@ public class CategoryController extends GenericControllerImpl<Category, Category
         }
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<?> findUnlockedCategories(){
+    @GetMapping("/filter/{itemTypeId}")
+    public ResponseEntity<?> findUnlockedCategories(@PathVariable Long itemTypeId){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(service.findUnlockedCategories());
+            return ResponseEntity.status(HttpStatus.OK).body(service.findUnlockedCategoriesByItemType(itemTypeId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }
     }
 
-    @GetMapping("/filter/{id}")
-    public ResponseEntity<?> findUnlockedCategoriesExceptId(@PathVariable Long id){
+    @GetMapping("/filter/{itemTypeId}/{id}")
+    public ResponseEntity<?> findUnlockedCategoriesExceptId(@PathVariable Long itemTypeId, @PathVariable Long id){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(service.findUnlockedCategoriesExceptId(id));
+            return ResponseEntity.status(HttpStatus.OK).body(service.findUnlockedCategoriesByItemTypeExceptId(itemTypeId, id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }

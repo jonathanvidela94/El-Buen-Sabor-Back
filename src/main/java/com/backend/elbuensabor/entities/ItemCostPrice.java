@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "item_cost_price")
@@ -18,8 +18,7 @@ public class ItemCostPrice extends GenericEntity{
     @Column(name = "cost_price")
     private Double costPrice;
     @Column(name = "cost_price_date")
-    private Date costPriceDate;
-
+    private LocalDateTime costPriceDate;
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_item")
     private Item item;

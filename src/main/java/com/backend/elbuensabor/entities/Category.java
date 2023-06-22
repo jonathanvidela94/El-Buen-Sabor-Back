@@ -30,4 +30,9 @@ public class Category extends GenericEntity{
     @OneToMany(mappedBy = "fatherCategory", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Category> childCategories;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "fk_item_type")
+    private ItemType itemType;
+
 }
