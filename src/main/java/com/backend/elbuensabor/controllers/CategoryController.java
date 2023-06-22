@@ -66,4 +66,14 @@ public class CategoryController extends GenericControllerImpl<Category, Category
         }
     }
 
+    //Fixing Categories front-end :D
+    @GetMapping("/filter")
+    public ResponseEntity<?> findUnlockedCategories(){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.findUnlockedCategories());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
 }
