@@ -15,6 +15,7 @@ import lombok.Setter;
 public class ItemStockConfig extends GenericEntity{
     @Column(name = "min_stock")
     private Integer minStock;
+
     @Column(name = "max_stock")
     private Integer maxStock;
 

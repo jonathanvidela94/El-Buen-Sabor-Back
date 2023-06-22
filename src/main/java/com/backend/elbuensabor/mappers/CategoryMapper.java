@@ -15,6 +15,7 @@ public interface CategoryMapper extends GenericMapper<Category, CategoryDTO> {
 
     @Mapping(source = "source.fatherCategory.id", target = "categoryFatherId")
     @Mapping(source = "source.fatherCategory.denomination", target = "categoryFatherDenomination")
+    @Mapping(source = "source.itemType.id", target = "itemTypeId")
     CategoryDTO toDTO(Category source);
 
     @Mapping(target = "fatherCategory", ignore = true)

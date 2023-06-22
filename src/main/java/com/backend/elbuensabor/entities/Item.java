@@ -15,8 +15,8 @@ import lombok.Setter;
 public class Item extends GenericEntity{
     @Column(name = "name")
     private String name;
-    @Column(name = "is_banned")
-    private Boolean isBanned;
+    @Column(name = "blocked")
+    private Boolean blocked;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_category")
@@ -26,6 +26,4 @@ public class Item extends GenericEntity{
     @JoinColumn(name = "fk_item_type")
     private ItemType itemType;
 
-    @OneToOne(mappedBy = "item", optional = false)
-    private Recipe recipe;
 }
