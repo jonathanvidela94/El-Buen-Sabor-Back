@@ -15,4 +15,6 @@ public interface CustomerRepository extends GenericRepository<Customer,Long>{
     @Query("SELECT c FROM Customer c JOIN FETCH c.user u WHERE u.auth0Id = :auth0Id")
     Customer findCustomerByUserAuth0Id(@Param("auth0Id") String auth0Id);
 
+    @Query("SELECT c FROM Customer c JOIN FETCH c.user u JOIN FETCH u.role r WHERE r.id = 5")
+    List<Customer> findAllCustomersWithRoleCliente();
 }

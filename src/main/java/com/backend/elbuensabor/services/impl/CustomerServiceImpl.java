@@ -45,4 +45,14 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDT
         }
     }
 
+    @Override
+    public List<CustomerDTO> findAllCustomersWithRoleCliente() throws Exception {
+        try {
+            List<Customer> customers = customerRepository.findAllCustomersWithRoleCliente();
+            return genericMapper.toDTOsList(customers);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }
