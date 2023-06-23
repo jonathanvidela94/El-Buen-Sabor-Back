@@ -135,4 +135,14 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
         }
     }
 
+    //Fixing Categories front-end :D
+    public List<CategoryDTO>findUnlockedCategories() throws Exception{
+        try {
+            List<Category> categories = categoryRepository.findUnlockedCategories();
+            return genericMapper.toDTOsList(categories);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }
