@@ -11,5 +11,6 @@ public interface ItemService extends GenericService<Item, ItemDTO, Long>{
     Item saveItem(ItemDTO dto) throws Exception;
     ItemDTO getItem(Long id) throws Exception;
     ItemDTO updateItem(Long ID, ItemDTO dto) throws Exception;
+    Item blockUnlockItem(Long id, boolean blocked) throws Exception;
 
 }
