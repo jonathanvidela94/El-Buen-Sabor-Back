@@ -39,4 +39,13 @@ public class CustomerController extends GenericControllerImpl<Customer, Customer
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
         }
     }
+
+    @GetMapping("/cliente-role")
+    public ResponseEntity<?> findAllCustomersWithRoleCliente() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.findAllCustomersWithRoleCliente());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ERROR_MESSAGE);
+        }
+    }
 }

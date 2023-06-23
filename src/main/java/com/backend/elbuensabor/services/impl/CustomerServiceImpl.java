@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDTO, Long> implements CustomerService {
@@ -40,6 +39,17 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDT
         try {
             Customer customer = customerRepository.findCustomerByUserAuth0Id(auth0Id);
             return customerMapper.toDTO(customer);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<CustomerDTO> findAllCustomersWithRoleCliente() throws Exception {
+        try {
+            List<Customer> customers = customerRepository.findAllCustomersWithRoleCliente();
+            return genericMapper.toDTOsList(customers);
         }
         catch (Exception e) {
             throw new Exception(e.getMessage());
