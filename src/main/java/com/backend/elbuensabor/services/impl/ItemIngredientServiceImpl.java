@@ -48,27 +48,29 @@ public class ItemIngredientServiceImpl extends GenericServiceImpl<Item, ItemIngr
     }
 
     @Override
-    public List<ItemIngredientDTO> getAllItemsIngredients() throws Exception{
+    public List<ItemIngredientDTO> getAllItemsIngredients() throws Exception {
         try {
             List<Item> items = itemRepository.findAll();
             List<ItemIngredientDTO> itemDTOs = new ArrayList<>();
 
             for (Item item : items) {
-                ItemMeasurementUnit itemMeasurementUnit = itemMeasurementUnitRepository.findByItemId(item.getId());
-                ItemIngredientDTO itemDTO = itemIngredientMapper.toDTO(item);
+                if (item.getItemType().getId() == 1) {
+                    ItemMeasurementUnit itemMeasurementUnit = itemMeasurementUnitRepository.findByItemId(item.getId());
+                    ItemIngredientDTO itemDTO = itemIngredientMapper.toDTO(item);
 
-                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
-                itemDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
+                    ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                    itemDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
 
-                ItemCostPrice latestItemCostPrice= itemCostPriceRepository.findLatestByItemId(item.getId());
-                itemDTO.setCostPrice(latestItemCostPrice.getCostPrice());
+                    ItemCostPrice latestItemCostPrice = itemCostPriceRepository.findLatestByItemId(item.getId());
+                    itemDTO.setCostPrice(latestItemCostPrice.getCostPrice());
 
-                ItemStockConfig itemStockConfig = itemStockConfigRepository.findItemStockConfigByItemId(item.getId());
-                itemDTO.setMinStock(itemStockConfig.getMinStock());
-                itemDTO.setMaxStock(itemStockConfig.getMaxStock());
+                    ItemStockConfig itemStockConfig = itemStockConfigRepository.findItemStockConfigByItemId(item.getId());
+                    itemDTO.setMinStock(itemStockConfig.getMinStock());
+                    itemDTO.setMaxStock(itemStockConfig.getMaxStock());
 
-                itemIngredientMapper.mapMeasurementUnitToDTO(itemDTO, item, itemMeasurementUnit);
-                itemDTOs.add(itemDTO);
+                    itemIngredientMapper.mapMeasurementUnitToDTO(itemDTO, item, itemMeasurementUnit);
+                    itemDTOs.add(itemDTO);
+                }
             }
 
             return itemDTOs;
