@@ -3,13 +3,12 @@ package com.backend.elbuensabor.DTO;
 import lombok.Data;
 
 @Data
-public class ItemDTO extends GenericDTO{
+public class ItemIngredientDTO extends GenericDTO{
     private String name;
     private Boolean blocked;
     private Long categoryId;
     private String categoryDenomination;
     private Long itemTypeId;
-    private String itemTypeDenomination;
     private Long measurementUnitId;
     private String measurementDenomination;
     private Integer currentStock;

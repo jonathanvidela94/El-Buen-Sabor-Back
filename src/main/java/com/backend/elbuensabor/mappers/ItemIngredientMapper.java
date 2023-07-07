@@ -1,6 +1,6 @@
 package com.backend.elbuensabor.mappers;
 
-import com.backend.elbuensabor.DTO.ItemDTO;
+import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.entities.Item;
 import com.backend.elbuensabor.entities.ItemMeasurementUnit;
 import com.backend.elbuensabor.entities.MeasurementUnit;
@@ -9,23 +9,22 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface ItemMapper extends GenericMapper<Item, ItemDTO> {
+public interface ItemIngredientMapper extends GenericMapper<Item, ItemIngredientDTO> {
 
-    static ItemMapper getInstance() { return Mappers.getMapper(ItemMapper.class); }
+    static ItemIngredientMapper getInstance() { return Mappers.getMapper(ItemIngredientMapper.class); }
 
     @Mapping(source = "source.category.id", target = "categoryId")
     @Mapping(source = "source.category.denomination", target = "categoryDenomination")
     @Mapping(source = "source.itemType.id", target = "itemTypeId")
-    @Mapping(source = "source.itemType.denomination", target = "itemTypeDenomination")
-    ItemDTO toDTO(Item source);
+    ItemIngredientDTO toDTO(Item source);
 
     @InheritInverseConfiguration
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "itemType", ignore = true)
-    Item toEntity(ItemDTO source);
+    Item toEntity(ItemIngredientDTO source);
 
     @AfterMapping
-    default ItemMeasurementUnit mapMeasurementUnit(ItemDTO source, @MappingTarget Item target, MeasurementUnitRepository measurementUnitRepository) {
+    default ItemMeasurementUnit mapMeasurementUnit(ItemIngredientDTO source, @MappingTarget Item target, MeasurementUnitRepository measurementUnitRepository) {
         MeasurementUnit measurementUnit = measurementUnitRepository.findById(source.getMeasurementUnitId())
                 .orElseThrow(() -> new RuntimeException("MeasurementUnit not found"));
         ItemMeasurementUnit itemMeasurementUnit = new ItemMeasurementUnit();
@@ -35,7 +34,7 @@ public interface ItemMapper extends GenericMapper<Item, ItemDTO> {
     }
 
     @AfterMapping
-    default void mapMeasurementUnitToDTO(@MappingTarget ItemDTO target, Item source, ItemMeasurementUnit itemMeasurementUnit) {
+    default void mapMeasurementUnitToDTO(@MappingTarget ItemIngredientDTO target, Item source, ItemMeasurementUnit itemMeasurementUnit) {
         target.setMeasurementUnitId(itemMeasurementUnit.getMeasurementUnit().getId());
         target.setMeasurementDenomination(itemMeasurementUnit.getMeasurementUnit().getDenomination());
     }

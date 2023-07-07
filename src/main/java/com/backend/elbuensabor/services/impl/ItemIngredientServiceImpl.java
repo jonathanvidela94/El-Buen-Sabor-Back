@@ -1,11 +1,11 @@
 package com.backend.elbuensabor.services.impl;
 
-import com.backend.elbuensabor.DTO.ItemDTO;
+import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
-import com.backend.elbuensabor.mappers.ItemMapper;
+import com.backend.elbuensabor.mappers.ItemIngredientMapper;
 import com.backend.elbuensabor.repositories.*;
-import com.backend.elbuensabor.services.ItemService;
+import com.backend.elbuensabor.services.ItemIngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> implements ItemService {
+public class ItemIngredientServiceImpl extends GenericServiceImpl<Item, ItemIngredientDTO, Long> implements ItemIngredientService {
 
     @Autowired
     private ItemRepository itemRepository;
@@ -41,34 +41,36 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
     @Autowired
     private ItemStockConfigRepository itemStockConfigRepository;
 
-    private final ItemMapper itemMapper = ItemMapper.getInstance();
+    private final ItemIngredientMapper itemIngredientMapper = ItemIngredientMapper.getInstance();
 
-    public ItemServiceImpl(GenericRepository<Item, Long> genericRepository, GenericMapper<Item, ItemDTO> genericMapper) {
+    public ItemIngredientServiceImpl(GenericRepository<Item, Long> genericRepository, GenericMapper<Item, ItemIngredientDTO> genericMapper) {
         super(genericRepository, genericMapper);
     }
 
     @Override
-    public List<ItemDTO> getAllItems() throws Exception{
+    public List<ItemIngredientDTO> getAllItemsIngredients() throws Exception {
         try {
             List<Item> items = itemRepository.findAll();
-            List<ItemDTO> itemDTOs = new ArrayList<>();
+            List<ItemIngredientDTO> itemDTOs = new ArrayList<>();
 
             for (Item item : items) {
-                ItemMeasurementUnit itemMeasurementUnit = itemMeasurementUnitRepository.findByItemId(item.getId());
-                ItemDTO itemDTO = itemMapper.toDTO(item);
+                if (item.getItemType().getId() == 1) {
+                    ItemMeasurementUnit itemMeasurementUnit = itemMeasurementUnitRepository.findByItemId(item.getId());
+                    ItemIngredientDTO itemDTO = itemIngredientMapper.toDTO(item);
 
-                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
-                itemDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
+                    ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                    itemDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
 
-                ItemCostPrice latestItemCostPrice= itemCostPriceRepository.findLatestByItemId(item.getId());
-                itemDTO.setCostPrice(latestItemCostPrice.getCostPrice());
+                    ItemCostPrice latestItemCostPrice = itemCostPriceRepository.findLatestByItemId(item.getId());
+                    itemDTO.setCostPrice(latestItemCostPrice.getCostPrice());
 
-                ItemStockConfig itemStockConfig = itemStockConfigRepository.findItemStockConfigByItemId(item.getId());
-                itemDTO.setMinStock(itemStockConfig.getMinStock());
-                itemDTO.setMaxStock(itemStockConfig.getMaxStock());
+                    ItemStockConfig itemStockConfig = itemStockConfigRepository.findItemStockConfigByItemId(item.getId());
+                    itemDTO.setMinStock(itemStockConfig.getMinStock());
+                    itemDTO.setMaxStock(itemStockConfig.getMaxStock());
 
-                itemMapper.mapMeasurementUnitToDTO(itemDTO, item, itemMeasurementUnit);
-                itemDTOs.add(itemDTO);
+                    itemIngredientMapper.mapMeasurementUnitToDTO(itemDTO, item, itemMeasurementUnit);
+                    itemDTOs.add(itemDTO);
+                }
             }
 
             return itemDTOs;
@@ -78,25 +80,25 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
     }
 
     @Override
-    public ItemDTO getItem(Long id) throws Exception{
+    public ItemIngredientDTO getItemIngredient(Long id) throws Exception{
         try {
             Item item = itemRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
             ItemMeasurementUnit itemMeasurementUnit = itemMeasurementUnitRepository.findByItemId(item.getId());
-            ItemDTO itemDTO = itemMapper.toDTO(item);
-            itemMapper.mapMeasurementUnitToDTO(itemDTO, item, itemMeasurementUnit);
+            ItemIngredientDTO itemIngredientDTO = itemIngredientMapper.toDTO(item);
+            itemIngredientMapper.mapMeasurementUnitToDTO(itemIngredientDTO, item, itemMeasurementUnit);
 
             ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
-            itemDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
+            itemIngredientDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
 
             ItemCostPrice latestItemCostPrice= itemCostPriceRepository.findLatestByItemId(item.getId());
-            itemDTO.setCostPrice(latestItemCostPrice.getCostPrice());
+            itemIngredientDTO.setCostPrice(latestItemCostPrice.getCostPrice());
 
             ItemStockConfig itemStockConfig = itemStockConfigRepository.findItemStockConfigByItemId(item.getId());
-            itemDTO.setMinStock(itemStockConfig.getMinStock());
-            itemDTO.setMaxStock(itemStockConfig.getMaxStock());
+            itemIngredientDTO.setMinStock(itemStockConfig.getMinStock());
+            itemIngredientDTO.setMaxStock(itemStockConfig.getMaxStock());
 
-            return itemDTO;
+            return itemIngredientDTO;
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -104,9 +106,9 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
 
     @Override
     @Transactional
-    public Item saveItem(ItemDTO dto) throws Exception {
+    public Item saveItemIngredient(ItemIngredientDTO dto) throws Exception {
         try {
-            Item item = itemMapper.toEntity(dto);
+            Item item = itemIngredientMapper.toEntity(dto);
 
             if(dto.getCategoryId() != null) {
                 if(categoryRepository.existsById(dto.getCategoryId())) {
@@ -130,7 +132,7 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
 
             Item savedItem = itemRepository.save(item);
 
-            ItemMeasurementUnit itemMeasurementUnit = itemMapper.mapMeasurementUnit(dto, savedItem, measurementUnitRepository);
+            ItemMeasurementUnit itemMeasurementUnit = itemIngredientMapper.mapMeasurementUnit(dto, savedItem, measurementUnitRepository);
 
             itemMeasurementUnitRepository.save(itemMeasurementUnit);
 
@@ -180,25 +182,25 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
 
     @Override
     @Transactional
-    public ItemDTO updateItem(Long id, ItemDTO itemDTO) throws Exception {
+    public ItemIngredientDTO updateItemIngredient(Long id, ItemIngredientDTO itemIngredientDTO) throws Exception {
         try {
             // Buscar el item en la base de datos utilizando el ID proporcionado
             Item item = itemRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
 
             // Actualizar los atributos del item con los nuevos valores del ItemDTO
-            item.setName(itemDTO.getName());
-            item.setBlocked(itemDTO.getBlocked());
+            item.setName(itemIngredientDTO.getName());
+            item.setBlocked(itemIngredientDTO.getBlocked());
 
-            if (itemDTO.getCategoryId() != null) {
-                Category category = categoryRepository.findById(itemDTO.getCategoryId())
-                        .orElseThrow(() -> new RuntimeException("Category not found with id: " + itemDTO.getCategoryId()));
+            if (itemIngredientDTO.getCategoryId() != null) {
+                Category category = categoryRepository.findById(itemIngredientDTO.getCategoryId())
+                        .orElseThrow(() -> new RuntimeException("Category not found with id: " + itemIngredientDTO.getCategoryId()));
                 item.setCategory(category);
             }
 
-            if (itemDTO.getItemTypeId() != null) {
-                ItemType itemType = itemTypeRepository.findById(itemDTO.getItemTypeId())
-                        .orElseThrow(() -> new RuntimeException("ItemType not found with id: " + itemDTO.getItemTypeId()));
+            if (itemIngredientDTO.getItemTypeId() != null) {
+                ItemType itemType = itemTypeRepository.findById(itemIngredientDTO.getItemTypeId())
+                        .orElseThrow(() -> new RuntimeException("ItemType not found with id: " + itemIngredientDTO.getItemTypeId()));
                 item.setItemType(itemType);
             }
 
@@ -206,13 +208,13 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
             Item updatedItem = itemRepository.save(item);
 
             // Crear y guardar un nuevo registro de ItemCurrentStock si se proporciona un nuevo current_stock
-            if (itemDTO.getCurrentStock() != null) {
+            if (itemIngredientDTO.getCurrentStock() != null) {
                 ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(updatedItem.getId());
 
                 // Verificar si el nuevo current_stock es diferente del último registro en la base de datos
-                if (latestItemCurrentStock == null || !latestItemCurrentStock.getCurrentStock().equals(itemDTO.getCurrentStock())) {
+                if (latestItemCurrentStock == null || !latestItemCurrentStock.getCurrentStock().equals(itemIngredientDTO.getCurrentStock())) {
                     ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
-                    newItemCurrentStock.setCurrentStock(itemDTO.getCurrentStock());
+                    newItemCurrentStock.setCurrentStock(itemIngredientDTO.getCurrentStock());
                     newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
                     newItemCurrentStock.setItem(updatedItem);
                     itemCurrentStockRepository.save(newItemCurrentStock);
@@ -220,13 +222,13 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
             }
 
             // Crear y guardar un nuevo registro de ItemCurrentStock si se proporciona un nuevo current_stock
-            if (itemDTO.getCostPrice() != null) {
+            if (itemIngredientDTO.getCostPrice() != null) {
                 ItemCostPrice latestItemCostPrice = itemCostPriceRepository.findLatestByItemId(updatedItem.getId());
 
                 // Verificar si el nuevo current_stock es diferente del último registro en la base de datos
-                if (latestItemCostPrice == null || !latestItemCostPrice.getCostPrice().equals(itemDTO.getCostPrice())) {
+                if (latestItemCostPrice == null || !latestItemCostPrice.getCostPrice().equals(itemIngredientDTO.getCostPrice())) {
                     ItemCostPrice newItemCostPrice = new ItemCostPrice();
-                    newItemCostPrice.setCostPrice(itemDTO.getCostPrice());
+                    newItemCostPrice.setCostPrice(itemIngredientDTO.getCostPrice());
                     newItemCostPrice.setCostPriceDate(LocalDateTime.now());
                     newItemCostPrice.setItem(updatedItem);
                     itemCostPriceRepository.save(newItemCostPrice);
@@ -234,11 +236,11 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
             }
 
             // Verificar si minStock y maxStock están presente en el DTO
-            if (itemDTO.getMinStock() != null && itemDTO.getMaxStock() != null) {
+            if (itemIngredientDTO.getMinStock() != null && itemIngredientDTO.getMaxStock() != null) {
                 // Crear una nueva instancia de ItemStockConfig
                 ItemStockConfig itemStockConfig = itemStockConfigRepository.findItemStockConfigByItemId(updatedItem.getId());
-                itemStockConfig.setMinStock(itemDTO.getMinStock());
-                itemStockConfig.setMaxStock(itemDTO.getMaxStock());
+                itemStockConfig.setMinStock(itemIngredientDTO.getMinStock());
+                itemStockConfig.setMaxStock(itemIngredientDTO.getMaxStock());
                 itemStockConfig.setItem(updatedItem);
 
                 // Guardar ItemStockConfig en la base de datos
@@ -247,19 +249,32 @@ public class ItemServiceImpl extends GenericServiceImpl<Item, ItemDTO, Long> imp
 
             // Buscar y actualizar ItemMeasurementUnit
             ItemMeasurementUnit itemMeasurementUnit = itemMeasurementUnitRepository.findByItemId(updatedItem.getId());
-            if (itemDTO.getMeasurementUnitId() != null) {
-                MeasurementUnit updatedMeasurementUnit = measurementUnitRepository.findById(itemDTO.getMeasurementUnitId())
-                        .orElseThrow(() -> new RuntimeException("MeasurementUnit not found with id: " + itemDTO.getMeasurementUnitId()));
+            if (itemIngredientDTO.getMeasurementUnitId() != null) {
+                MeasurementUnit updatedMeasurementUnit = measurementUnitRepository.findById(itemIngredientDTO.getMeasurementUnitId())
+                        .orElseThrow(() -> new RuntimeException("MeasurementUnit not found with id: " + itemIngredientDTO.getMeasurementUnitId()));
                 itemMeasurementUnit.setMeasurementUnit(updatedMeasurementUnit);
                 itemMeasurementUnitRepository.save(itemMeasurementUnit);
             }
 
             // Convertir el item actualizado a ItemDTO y devolverlo
-            ItemDTO updatedItemDTOResult = itemMapper.toDTO(updatedItem);
-            itemMapper.mapMeasurementUnitToDTO(updatedItemDTOResult, updatedItem, itemMeasurementUnit);
+            ItemIngredientDTO updatedItemIngredientDTOResult = itemIngredientMapper.toDTO(updatedItem);
+            itemIngredientMapper.mapMeasurementUnitToDTO(updatedItemIngredientDTOResult, updatedItem, itemMeasurementUnit);
 
-            return updatedItemDTOResult;
+            return updatedItemIngredientDTOResult;
         } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public Item blockUnlockItem(Long id, boolean blocked) throws Exception{
+        try {
+            Item item = itemRepository.findById(id).orElseThrow(() -> new Exception("Item not found"));
+            item.setBlocked(blocked);
+            return itemRepository.save(item);
+        }
+        catch (Exception e) {
             throw new Exception(e.getMessage());
         }
     }
