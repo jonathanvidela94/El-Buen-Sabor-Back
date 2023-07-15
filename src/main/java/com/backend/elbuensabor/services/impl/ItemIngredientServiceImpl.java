@@ -4,8 +4,8 @@ import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.ItemIngredientMapper;
-import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.ItemIngredientService;
+import com.backend.elbuensabor.services.impl.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -221,11 +221,11 @@ public class ItemIngredientServiceImpl extends GenericServiceImpl<Item, ItemIngr
                 }
             }
 
-            // Crear y guardar un nuevo registro de ItemCurrentStock si se proporciona un nuevo current_stock
+            // Crear y guardar un nuevo registro de ItemCurrentStock si se proporciona un nuevo cost_price
             if (itemIngredientDTO.getCostPrice() != null) {
                 ItemCostPrice latestItemCostPrice = itemCostPriceRepository.findLatestByItemId(updatedItem.getId());
 
-                // Verificar si el nuevo current_stock es diferente del último registro en la base de datos
+                // Verificar si el nuevo cost_price es diferente del último registro en la base de datos
                 if (latestItemCostPrice == null || !latestItemCostPrice.getCostPrice().equals(itemIngredientDTO.getCostPrice())) {
                     ItemCostPrice newItemCostPrice = new ItemCostPrice();
                     newItemCostPrice.setCostPrice(itemIngredientDTO.getCostPrice());
