@@ -1,6 +1,5 @@
 package com.backend.elbuensabor.controllers;
 
-import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.DTO.ItemProductDTO;
 import com.backend.elbuensabor.controllers.impl.GenericControllerImpl;
 import com.backend.elbuensabor.entities.Item;

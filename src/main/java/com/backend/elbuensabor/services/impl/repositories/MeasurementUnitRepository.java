@@ -1,4 +1,4 @@
-package com.backend.elbuensabor.repositories;
+package com.backend.elbuensabor.services.impl.repositories;
 
 import com.backend.elbuensabor.entities.MeasurementUnit;
 import org.springframework.stereotype.Repository;

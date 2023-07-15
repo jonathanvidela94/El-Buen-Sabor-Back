@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemImage extends GenericEntity{
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition = "MEDIUMTEXT")
     private String image;
 
     @ManyToOne(optional = false)

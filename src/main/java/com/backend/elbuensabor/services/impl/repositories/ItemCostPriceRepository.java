@@ -1,4 +1,4 @@
-package com.backend.elbuensabor.repositories;
+package com.backend.elbuensabor.services.impl.repositories;
 
 import com.backend.elbuensabor.entities.ItemCostPrice;
 import org.springframework.data.jpa.repository.Query;

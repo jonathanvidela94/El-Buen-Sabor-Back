@@ -1,17 +1,17 @@
 package com.backend.elbuensabor.services.impl;
 
 import com.backend.elbuensabor.DTO.IngredientDTO;
-import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.DTO.ItemProductDTO;
 import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.ItemProductMapper;
-import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.ItemProductService;
+import com.backend.elbuensabor.services.impl.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +25,19 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private ItemDescriptionRepository itemDescriptionRepository;
+
+    @Autowired
+    private ItemSellPriceRepository itemSellPriceRepository;
+
+    @Autowired
     RecipeRepository recipeRepository;
 
     @Autowired
     RecipeDetailRepository recipeDetailRepository;
+
+    @Autowired
+    ItemImageRepository itemImageRepository;
 
     @Autowired
     private ItemTypeRepository itemTypeRepository;
@@ -51,6 +60,13 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 recipe.setRecipeDetails(recipeDetails);
 
                 ItemProductDTO itemProductDTO = itemProductMapper.toDTO(item);
+
+                ItemDescription itemDescription = itemDescriptionRepository.findItemDesciptionByItemId(item.getId());
+                itemProductDTO.setDescription(itemDescription.getDescription());
+
+                ItemSellPrice itemSellPrice = itemSellPriceRepository.findLatestByItemId(item.getId());
+                itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
+
                 itemProductDTO.setRecipeDescription(recipe.getDescription());
 
                 List<IngredientDTO> ingredientDTOList = new ArrayList<>();
@@ -61,6 +77,9 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                     ingredientDTOList.add(ingredientDTO);
                 }
                 itemProductDTO.setIngredients(ingredientDTOList);
+
+                ItemImage itemImage = itemImageRepository.findItemImageByItemId(item.getId());
+                itemProductDTO.setImage(itemImage.getImage());
 
                 itemProductDTOList.add(itemProductDTO);
             }
@@ -79,6 +98,13 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
         recipe.setRecipeDetails(recipeDetails);
 
         ItemProductDTO itemProductDTO = itemProductMapper.toDTO(item);
+
+        ItemDescription itemDescription = itemDescriptionRepository.findItemDesciptionByItemId(item.getId());
+        itemProductDTO.setDescription(itemDescription.getDescription());
+
+        ItemSellPrice itemSellPrice = itemSellPriceRepository.findLatestByItemId(item.getId());
+        itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
+
         itemProductDTO.setRecipeDescription(recipe.getDescription());
 
         List<IngredientDTO> ingredientDTOList = new ArrayList<>();
@@ -89,6 +115,9 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
             ingredientDTOList.add(ingredientDTO);
         }
         itemProductDTO.setIngredients(ingredientDTOList);
+
+        ItemImage itemImage = itemImageRepository.findItemImageByItemId(item.getId());
+        itemProductDTO.setImage(itemImage.getImage());
 
         return itemProductDTO;
     }
@@ -122,6 +151,23 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
             // Guardar el ítem en la base de datos
             Item savedItem = itemRepository.save(item);
+
+            if(dto.getDescription() != null) {
+                ItemDescription itemDescription = new ItemDescription();
+                itemDescription.setDescription(dto.getDescription());
+                itemDescription.setItem(savedItem);
+
+                itemDescriptionRepository.save(itemDescription);
+            }
+
+            if(dto.getSellPrice() != null) {
+                ItemSellPrice itemSellPrice = new ItemSellPrice();
+                itemSellPrice.setSellPrice(dto.getSellPrice());
+                itemSellPrice.setSellPriceDate(LocalDateTime.now());
+                itemSellPrice.setItem(savedItem);
+
+                itemSellPriceRepository.save(itemSellPrice);
+            }
 
             // Crear y guardar receta asociada al ítem
             Recipe recipe = new Recipe();
@@ -167,6 +213,16 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
             // Asignar detalles de receta a la receta
             recipe.setRecipeDetails(recipeDetails);
 
+            //Verificar si image esta presente en el DTO
+            if(dto.getImage() != null) {
+                // Crear y relacionar el objeto ItemImage
+                ItemImage itemImage = new ItemImage();
+                itemImage.setImage(dto.getImage());
+                itemImage.setItem(savedItem);
+
+                itemImageRepository.save(itemImage);
+            }
+
             return savedItem;
         } catch (Exception e) {
             throw new Exception("Error al guardar el producto", e);
@@ -201,6 +257,30 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
             // Guarda el producto actualizado en la base de datos
             Item updatedItem = itemRepository.save(item);
+
+            if(itemProductDTO.getDescription() != null) {
+                ItemDescription itemDescription = itemDescriptionRepository.findItemDesciptionByItemId(updatedItem.getId());
+
+                if(itemDescription == null || !itemDescription.getDescription().equals(itemProductDTO.getDescription())){
+                    itemDescription.setDescription(itemProductDTO.getDescription());
+                    itemDescription.setItem(updatedItem);
+
+                    itemDescriptionRepository.save(itemDescription);
+                }
+            }
+
+            if (itemProductDTO.getSellPrice() != null) {
+                ItemSellPrice latestItemSellPrice = itemSellPriceRepository.findLatestByItemId(updatedItem.getId());
+
+                // Verificar si el nuevo cost_price es diferente del último registro en la base de datos
+                if (latestItemSellPrice == null || !latestItemSellPrice.getSellPrice().equals(itemProductDTO.getSellPrice())) {
+                    ItemSellPrice newItemSellPrice = new ItemSellPrice();
+                    newItemSellPrice.setSellPrice(itemProductDTO.getSellPrice());
+                    newItemSellPrice.setSellPriceDate(LocalDateTime.now());
+                    newItemSellPrice.setItem(updatedItem);
+                    itemSellPriceRepository.save(newItemSellPrice);
+                }
+            }
 
             // Busca la receta existente asociada con el producto
             Recipe existingRecipe = recipeRepository.findByItemId(updatedItem.getId());
@@ -246,6 +326,16 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
             // Convierte el producto actualizado a un objeto ItemProductDTO y lo devuelve
             ItemProductDTO updatedItemProductDTOResult = itemProductMapper.toDTO(updatedItem);
+
+            if(itemProductDTO.getImage() != null) {
+                ItemImage latestItemImage = itemImageRepository.findItemImageByItemId(updatedItem.getId());
+
+                if(latestItemImage == null || !latestItemImage.getImage().equals(itemProductDTO.getImage())){
+                    latestItemImage.setImage(itemProductDTO.getImage());
+                    latestItemImage.setItem(updatedItem);
+                    itemImageRepository.save(latestItemImage);
+                }
+            }
 
             return updatedItemProductDTOResult;
         } catch (Exception e) {
