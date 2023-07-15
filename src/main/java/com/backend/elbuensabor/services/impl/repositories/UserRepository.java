@@ -1,0 +1,9 @@
+package com.backend.elbuensabor.services.impl.repositories;
+
+import com.backend.elbuensabor.entities.User;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRepository extends GenericRepository<User, Long>{
+
+}
