@@ -72,7 +72,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 List<IngredientDTO> ingredientDTOList = new ArrayList<>();
                 for (RecipeDetail recipeDetail : recipeDetails) {
                     IngredientDTO ingredientDTO = new IngredientDTO();
-                    ingredientDTO.setIdIngredient(recipeDetail.getItem().getId());
+                    ingredientDTO.setId(recipeDetail.getItem().getId());
                     ingredientDTO.setQuantity(recipeDetail.getQuantity());
                     ingredientDTOList.add(ingredientDTO);
                 }
@@ -110,7 +110,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
         List<IngredientDTO> ingredientDTOList = new ArrayList<>();
         for (RecipeDetail recipeDetail : recipeDetails) {
             IngredientDTO ingredientDTO = new IngredientDTO();
-            ingredientDTO.setIdIngredient(recipeDetail.getItem().getId());
+            ingredientDTO.setId(recipeDetail.getItem().getId());
             ingredientDTO.setQuantity(recipeDetail.getQuantity());
             ingredientDTOList.add(ingredientDTO);
         }
@@ -171,7 +171,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
             // Crear y guardar receta asociada al ítem
             Recipe recipe = new Recipe();
-            recipe.setItem(item);
+            recipe.setItem(savedItem);
             recipe.setDescription(dto.getRecipeDescription());
             recipeRepository.save(recipe);
 
@@ -184,15 +184,15 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
                 // Obtener y asignar ingrediente al detalle de receta
                 try {
-                    Optional<Item> itemIngredientOptional = itemRepository.findById(ingredientDTO.getIdIngredient());
+                    Optional<Item> itemIngredientOptional = itemRepository.findById(ingredientDTO.getId());
                     if (itemIngredientOptional.isPresent()) {
                         Item itemIngredient = itemIngredientOptional.get();
                         recipeDetail.setItem(itemIngredient);
                     } else {
-                        throw new Exception("El ingrediente con ID " + ingredientDTO.getIdIngredient() + " no existe");
+                        throw new Exception("El ingrediente con ID " + ingredientDTO.getId() + " no existe");
                     }
                 } catch (Exception e) {
-                    throw new Exception("Error al obtener el ingrediente con ID " + ingredientDTO.getIdIngredient(), e);
+                    throw new Exception("Error al obtener el ingrediente con ID " + ingredientDTO.getId(), e);
                 }
 
                 // Asignar receta y cantidad al detalle de receta
@@ -306,8 +306,8 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 RecipeDetail newRecipeDetail = new RecipeDetail();
 
                 // Busca el ingrediente en la base de datos y lo asigna al detalle de la receta
-                Item itemIngredient = itemRepository.findById(ingredientDTO.getIdIngredient())
-                        .orElseThrow(() -> new Exception("El ingrediente con ID " + ingredientDTO.getIdIngredient() + " no existe"));
+                Item itemIngredient = itemRepository.findById(ingredientDTO.getId())
+                        .orElseThrow(() -> new Exception("El ingrediente con ID " + ingredientDTO.getId() + " no existe"));
                 newRecipeDetail.setItem(itemIngredient);
 
                 // Asigna la receta existente y la cantidad al detalle de la receta
