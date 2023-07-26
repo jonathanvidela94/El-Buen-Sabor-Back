@@ -1,4 +1,4 @@
-package com.backend.elbuensabor.services.impl.repositories;
+package com.backend.elbuensabor.repositories;
 
 import com.backend.elbuensabor.entities.Recipe;
 import org.springframework.data.jpa.repository.Query;

@@ -3,7 +3,7 @@ package com.backend.elbuensabor.services.impl;
 import com.backend.elbuensabor.DTO.GenericDTO;
 import com.backend.elbuensabor.entities.GenericEntity;
 import com.backend.elbuensabor.mappers.GenericMapper;
-import com.backend.elbuensabor.services.impl.repositories.GenericRepository;
+import com.backend.elbuensabor.repositories.GenericRepository;
 import com.backend.elbuensabor.services.GenericService;
 import org.springframework.transaction.annotation.Transactional;
 

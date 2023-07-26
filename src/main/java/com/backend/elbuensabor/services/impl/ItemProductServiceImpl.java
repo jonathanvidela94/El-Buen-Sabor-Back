@@ -5,8 +5,8 @@ import com.backend.elbuensabor.DTO.ItemProductDTO;
 import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.ItemProductMapper;
+import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.ItemProductService;
-import com.backend.elbuensabor.services.impl.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +68,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
 
                 itemProductDTO.setRecipeDescription(recipe.getDescription());
+                itemProductDTO.setPreparationTime(recipe.getPreparationTime());
 
                 List<IngredientDTO> ingredientDTOList = new ArrayList<>();
                 for (RecipeDetail recipeDetail : recipeDetails) {
@@ -106,6 +107,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
         itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
 
         itemProductDTO.setRecipeDescription(recipe.getDescription());
+        itemProductDTO.setPreparationTime(recipe.getPreparationTime());
 
         List<IngredientDTO> ingredientDTOList = new ArrayList<>();
         for (RecipeDetail recipeDetail : recipeDetails) {
@@ -173,6 +175,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
             Recipe recipe = new Recipe();
             recipe.setItem(savedItem);
             recipe.setDescription(dto.getRecipeDescription());
+            recipe.setPreparationTime(dto.getPreparationTime());
             recipeRepository.save(recipe);
 
             // Crear lista para almacenar detalles de receta
@@ -293,6 +296,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
             // Actualiza la descripción de la receta con el valor de ItemProductDTO
             existingRecipe.setDescription(itemProductDTO.getRecipeDescription());
+            existingRecipe.setPreparationTime(itemProductDTO.getPreparationTime());
             recipeRepository.save(existingRecipe);
 
             // Elimina todos los detalles de la receta existentes
@@ -340,6 +344,19 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
             return updatedItemProductDTOResult;
         } catch (Exception e) {
             throw new Exception("Error al actualizar el producto", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Item blockUnlockItem(Long id, boolean blocked) throws Exception{
+        try {
+            Item item = itemRepository.findById(id).orElseThrow(() -> new Exception("Item not found"));
+            item.setBlocked(blocked);
+            return itemRepository.save(item);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 

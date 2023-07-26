@@ -18,6 +18,9 @@ public class Recipe extends GenericEntity{
     @Column(name = "description")
     private String description;
 
+    @Column(name = "preparationTime")
+    private int preparationTime;
+
     @OneToOne(optional = false)
     @JoinColumn(name = "fk_item")
     private Item item;

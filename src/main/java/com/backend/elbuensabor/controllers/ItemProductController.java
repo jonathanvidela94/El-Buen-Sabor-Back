@@ -58,4 +58,14 @@ public class ItemProductController extends GenericControllerImpl<Item, ItemProdu
         }
     }
 
+    @PutMapping("/{id}/block")
+    public ResponseEntity<?> blockUnlockItem(@PathVariable Long id, @RequestParam boolean blocked) {
+        try {
+            Item item = service.blockUnlockItem(id, blocked);
+            return ResponseEntity.status(HttpStatus.OK).body(item);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
 }
