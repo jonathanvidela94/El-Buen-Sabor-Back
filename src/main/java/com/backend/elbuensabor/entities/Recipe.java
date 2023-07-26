@@ -19,7 +19,7 @@ public class Recipe extends GenericEntity{
     private String description;
 
     @Column(name = "preparationTime")
-    private int preparationTime;
+    private Integer preparationTime;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "fk_item")

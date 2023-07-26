@@ -42,6 +42,9 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
     @Autowired
     private ItemTypeRepository itemTypeRepository;
 
+    @Autowired
+    private ItemCurrentStockRepository itemCurrentStockRepository;
+
     private final ItemProductMapper itemProductMapper = ItemProductMapper.getInstance();
 
     public ItemProductServiceImpl(GenericRepository<Item, Long> genericRepository, GenericMapper<Item, ItemProductDTO> genericMapper){
@@ -66,6 +69,9 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
                 ItemSellPrice itemSellPrice = itemSellPriceRepository.findLatestByItemId(item.getId());
                 itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
+
+                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                itemProductDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
 
                 itemProductDTO.setRecipeDescription(recipe.getDescription());
                 itemProductDTO.setPreparationTime(recipe.getPreparationTime());
@@ -105,6 +111,9 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
         ItemSellPrice itemSellPrice = itemSellPriceRepository.findLatestByItemId(item.getId());
         itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
+
+        ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+        itemProductDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
 
         itemProductDTO.setRecipeDescription(recipe.getDescription());
         itemProductDTO.setPreparationTime(recipe.getPreparationTime());
@@ -169,6 +178,15 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 itemSellPrice.setItem(savedItem);
 
                 itemSellPriceRepository.save(itemSellPrice);
+            }
+
+            if(dto.getCurrentStock() != null) {
+                ItemCurrentStock itemCurrentStock = new ItemCurrentStock();
+                itemCurrentStock.setCurrentStock(dto.getCurrentStock());
+                itemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                itemCurrentStock.setItem(savedItem);
+
+                itemCurrentStockRepository.save(itemCurrentStock);
             }
 
             // Crear y guardar receta asociada al ítem
@@ -282,6 +300,20 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                     newItemSellPrice.setSellPriceDate(LocalDateTime.now());
                     newItemSellPrice.setItem(updatedItem);
                     itemSellPriceRepository.save(newItemSellPrice);
+                }
+            }
+
+            // Crear y guardar un nuevo registro de ItemCurrentStock si se proporciona un nuevo current_stock
+            if (itemProductDTO.getCurrentStock() != null) {
+                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(updatedItem.getId());
+
+                // Verificar si el nuevo current_stock es diferente del último registro en la base de datos
+                if (latestItemCurrentStock == null || !latestItemCurrentStock.getCurrentStock().equals(itemProductDTO.getCurrentStock())) {
+                    ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                    newItemCurrentStock.setCurrentStock(itemProductDTO.getCurrentStock());
+                    newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                    newItemCurrentStock.setItem(updatedItem);
+                    itemCurrentStockRepository.save(newItemCurrentStock);
                 }
             }
 
