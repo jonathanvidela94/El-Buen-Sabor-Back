@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class RecipeDTO extends GenericDTO{
     private String description;
+    private int preparationTime;
     private Item item;
     private List<RecipeDetail> recipeDetails;
 }
