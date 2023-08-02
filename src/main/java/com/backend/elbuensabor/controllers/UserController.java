@@ -27,5 +27,12 @@ public class UserController extends GenericControllerImpl<User, UserDTO> {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }
     }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmailExists(@RequestParam String email) {
+        boolean emailExists = service.checkEmailExists(email);
+        return ResponseEntity.ok(emailExists);
+    }
+
 }
 

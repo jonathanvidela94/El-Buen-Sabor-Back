@@ -32,4 +32,9 @@ public class UserServiceImpl extends GenericServiceImpl<User, UserDTO, Long> imp
             throw  new Exception(e.getMessage());
         }
     }
+
+    @Override
+    public boolean checkEmailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }
