@@ -322,4 +322,18 @@ public class ItemDrinkServiceImpl extends GenericServiceImpl<Item, ItemDrinkDTO,
         }
         return null;
     }
+
+    @Override
+    @Transactional
+    public Item blockUnlockItem(Long id, boolean blocked) throws Exception{
+        try {
+            Item item = itemRepository.findById(id).orElseThrow(() -> new Exception("Item not found"));
+            item.setBlocked(blocked);
+            return itemRepository.save(item);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }

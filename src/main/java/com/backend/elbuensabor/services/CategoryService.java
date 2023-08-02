@@ -14,4 +14,5 @@ public interface CategoryService extends GenericService<Category, CategoryDTO, L
 
     //Fixing Categories front-end :D
     List<CategoryDTO> findUnlockedCategories() throws Exception;
+    List<CategoryDTO> findCategoriesByItemTypes() throws Exception;
 }
