@@ -5,7 +5,7 @@ import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.ItemDrinkMapper;
 import com.backend.elbuensabor.services.ItemDrinkService;
-import com.backend.elbuensabor.services.impl.repositories.*;
+import com.backend.elbuensabor.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -322,4 +322,18 @@ public class ItemDrinkServiceImpl extends GenericServiceImpl<Item, ItemDrinkDTO,
         }
         return null;
     }
+
+    @Override
+    @Transactional
+    public Item blockUnlockItem(Long id, boolean blocked) throws Exception{
+        try {
+            Item item = itemRepository.findById(id).orElseThrow(() -> new Exception("Item not found"));
+            item.setBlocked(blocked);
+            return itemRepository.save(item);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }
