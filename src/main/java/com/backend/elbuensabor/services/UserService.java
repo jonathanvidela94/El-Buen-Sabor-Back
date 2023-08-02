@@ -5,5 +5,5 @@ import com.backend.elbuensabor.entities.User;
 
 public interface UserService extends GenericService<User, UserDTO, Long>{
     User bloquearDesbloquearEmpleado(Long id, boolean blocked) throws Exception;
-
+    boolean checkEmailExists(String email);
 }
