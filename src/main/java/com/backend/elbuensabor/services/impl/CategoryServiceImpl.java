@@ -145,4 +145,15 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
             throw new Exception(e.getMessage());
         }
     }
+
+    public List<CategoryDTO> findCategoriesByItemTypes() throws Exception{
+        try {
+            List<Category> categories = categoryRepository.findCategoriesByItemTypes();
+            return genericMapper.toDTOsList(categories);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }

@@ -76,4 +76,13 @@ public class CategoryController extends GenericControllerImpl<Category, Category
         }
     }
 
+    @GetMapping("/filter/ingredients")
+    public ResponseEntity<?> findCategoriesByItemTypes(){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.findCategoriesByItemTypes());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
 }
