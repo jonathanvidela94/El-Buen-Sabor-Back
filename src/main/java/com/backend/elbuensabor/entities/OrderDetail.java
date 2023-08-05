@@ -13,8 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetail extends GenericEntity{
+
     @Column(name = "quantity")
     private Integer quantity;
+
     @Column(name = "subtotal")
     private Double subtotal;
 

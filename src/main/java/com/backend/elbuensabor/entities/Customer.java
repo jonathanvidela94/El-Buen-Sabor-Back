@@ -30,10 +30,7 @@ public class Customer extends GenericEntity{
     @JoinColumn(name = "fk_user")
     private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "customer_orders",
-            joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(name = "orders_id"))
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<Orders> orders;
+
 }
