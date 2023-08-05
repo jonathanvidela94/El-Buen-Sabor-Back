@@ -8,19 +8,11 @@ import java.util.List;
 
 @Data
 public class CustomerDTO extends GenericDTO {
-
     private String name;
-
     private String lastname;
-
     private String phone;
-
     private String address;
-
     private String apartment;
-
     private User user;
-
     private List<Orders> orders;
-
 }
