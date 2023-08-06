@@ -304,5 +304,30 @@ public class    Auth0TokenController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user paswword");
         }
     }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<String> getUser(@PathVariable String id) {
+        try {
+            String token = getTokenAPI();
+            String encodedUserId = URLEncoder.encode(id, StandardCharsets.UTF_8).replace("|", "%7C");
+            String url = "https://" + domain + "/api/v2/users/" + encodedUserId;
+
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .addHeader("Authorization", "Bearer " + token)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String responseBody = response.body().string();
+
+            return ResponseEntity.ok(responseBody);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
 

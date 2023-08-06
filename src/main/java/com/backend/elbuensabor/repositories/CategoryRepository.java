@@ -1,4 +1,4 @@
-package com.backend.elbuensabor.services.impl.repositories;
+package com.backend.elbuensabor.repositories;
 
 import com.backend.elbuensabor.entities.Category;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +18,7 @@ public interface CategoryRepository extends GenericRepository<Category,Long>{
     //Fixing Categories front-end :D
     @Query (value = "SELECT * FROM category WHERE blocked = false", nativeQuery = true)
     List<Category> findUnlockedCategories();
+
+    @Query(value = "SELECT * FROM category WHERE fk_item_type IN (2, 3)", nativeQuery = true)
+    List<Category> findCategoriesByItemTypes();
 }

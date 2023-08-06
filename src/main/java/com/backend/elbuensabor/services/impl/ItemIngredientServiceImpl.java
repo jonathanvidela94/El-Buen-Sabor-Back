@@ -2,11 +2,13 @@ package com.backend.elbuensabor.services.impl;
 
 import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.entities.*;
+import com.backend.elbuensabor.events.StockChangeEvent;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.ItemIngredientMapper;
+import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.ItemIngredientService;
-import com.backend.elbuensabor.services.impl.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,9 @@ public class ItemIngredientServiceImpl extends GenericServiceImpl<Item, ItemIngr
 
     @Autowired
     private ItemStockConfigRepository itemStockConfigRepository;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private final ItemIngredientMapper itemIngredientMapper = ItemIngredientMapper.getInstance();
 
@@ -218,6 +223,8 @@ public class ItemIngredientServiceImpl extends GenericServiceImpl<Item, ItemIngr
                     newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
                     newItemCurrentStock.setItem(updatedItem);
                     itemCurrentStockRepository.save(newItemCurrentStock);
+
+                    eventPublisher.publishEvent(new StockChangeEvent(this, itemIngredientDTO.getId()));
                 }
             }
 

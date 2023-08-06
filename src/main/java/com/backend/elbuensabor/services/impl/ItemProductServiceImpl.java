@@ -5,8 +5,8 @@ import com.backend.elbuensabor.DTO.ItemProductDTO;
 import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.ItemProductMapper;
+import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.ItemProductService;
-import com.backend.elbuensabor.services.impl.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 @Service
 public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProductDTO, Long> implements ItemProductService {
     @Autowired
@@ -42,6 +41,9 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
     @Autowired
     private ItemTypeRepository itemTypeRepository;
 
+    @Autowired
+    private ItemCurrentStockRepository itemCurrentStockRepository;
+
     private final ItemProductMapper itemProductMapper = ItemProductMapper.getInstance();
 
     public ItemProductServiceImpl(GenericRepository<Item, Long> genericRepository, GenericMapper<Item, ItemProductDTO> genericMapper){
@@ -67,12 +69,16 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 ItemSellPrice itemSellPrice = itemSellPriceRepository.findLatestByItemId(item.getId());
                 itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
 
+                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                itemProductDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
+
                 itemProductDTO.setRecipeDescription(recipe.getDescription());
+                itemProductDTO.setPreparationTime(recipe.getPreparationTime());
 
                 List<IngredientDTO> ingredientDTOList = new ArrayList<>();
                 for (RecipeDetail recipeDetail : recipeDetails) {
                     IngredientDTO ingredientDTO = new IngredientDTO();
-                    ingredientDTO.setIdIngredient(recipeDetail.getItem().getId());
+                    ingredientDTO.setId(recipeDetail.getItem().getId());
                     ingredientDTO.setQuantity(recipeDetail.getQuantity());
                     ingredientDTOList.add(ingredientDTO);
                 }
@@ -105,12 +111,16 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
         ItemSellPrice itemSellPrice = itemSellPriceRepository.findLatestByItemId(item.getId());
         itemProductDTO.setSellPrice(itemSellPrice.getSellPrice());
 
+        ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+        itemProductDTO.setCurrentStock(latestItemCurrentStock.getCurrentStock());
+
         itemProductDTO.setRecipeDescription(recipe.getDescription());
+        itemProductDTO.setPreparationTime(recipe.getPreparationTime());
 
         List<IngredientDTO> ingredientDTOList = new ArrayList<>();
         for (RecipeDetail recipeDetail : recipeDetails) {
             IngredientDTO ingredientDTO = new IngredientDTO();
-            ingredientDTO.setIdIngredient(recipeDetail.getItem().getId());
+            ingredientDTO.setId(recipeDetail.getItem().getId());
             ingredientDTO.setQuantity(recipeDetail.getQuantity());
             ingredientDTOList.add(ingredientDTO);
         }
@@ -169,10 +179,20 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 itemSellPriceRepository.save(itemSellPrice);
             }
 
+            if(dto.getCurrentStock() != null) {
+                ItemCurrentStock itemCurrentStock = new ItemCurrentStock();
+                itemCurrentStock.setCurrentStock(dto.getCurrentStock());
+                itemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                itemCurrentStock.setItem(savedItem);
+
+                itemCurrentStockRepository.save(itemCurrentStock);
+            }
+
             // Crear y guardar receta asociada al ítem
             Recipe recipe = new Recipe();
-            recipe.setItem(item);
+            recipe.setItem(savedItem);
             recipe.setDescription(dto.getRecipeDescription());
+            recipe.setPreparationTime(dto.getPreparationTime());
             recipeRepository.save(recipe);
 
             // Crear lista para almacenar detalles de receta
@@ -184,15 +204,15 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
                 // Obtener y asignar ingrediente al detalle de receta
                 try {
-                    Optional<Item> itemIngredientOptional = itemRepository.findById(ingredientDTO.getIdIngredient());
+                    Optional<Item> itemIngredientOptional = itemRepository.findById(ingredientDTO.getId());
                     if (itemIngredientOptional.isPresent()) {
                         Item itemIngredient = itemIngredientOptional.get();
                         recipeDetail.setItem(itemIngredient);
                     } else {
-                        throw new Exception("El ingrediente con ID " + ingredientDTO.getIdIngredient() + " no existe");
+                        throw new Exception("El ingrediente con ID " + ingredientDTO.getId() + " no existe");
                     }
                 } catch (Exception e) {
-                    throw new Exception("Error al obtener el ingrediente con ID " + ingredientDTO.getIdIngredient(), e);
+                    throw new Exception("Error al obtener el ingrediente con ID " + ingredientDTO.getId(), e);
                 }
 
                 // Asignar receta y cantidad al detalle de receta
@@ -282,6 +302,20 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 }
             }
 
+            // Crear y guardar un nuevo registro de ItemCurrentStock si se proporciona un nuevo current_stock
+            if (itemProductDTO.getCurrentStock() != null) {
+                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(updatedItem.getId());
+
+                // Verificar si el nuevo current_stock es diferente del último registro en la base de datos
+                if (latestItemCurrentStock == null || !latestItemCurrentStock.getCurrentStock().equals(itemProductDTO.getCurrentStock())) {
+                    ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                    newItemCurrentStock.setCurrentStock(itemProductDTO.getCurrentStock());
+                    newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                    newItemCurrentStock.setItem(updatedItem);
+                    itemCurrentStockRepository.save(newItemCurrentStock);
+                }
+            }
+
             // Busca la receta existente asociada con el producto
             Recipe existingRecipe = recipeRepository.findByItemId(updatedItem.getId());
 
@@ -293,6 +327,7 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
 
             // Actualiza la descripción de la receta con el valor de ItemProductDTO
             existingRecipe.setDescription(itemProductDTO.getRecipeDescription());
+            existingRecipe.setPreparationTime(itemProductDTO.getPreparationTime());
             recipeRepository.save(existingRecipe);
 
             // Elimina todos los detalles de la receta existentes
@@ -306,8 +341,8 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                 RecipeDetail newRecipeDetail = new RecipeDetail();
 
                 // Busca el ingrediente en la base de datos y lo asigna al detalle de la receta
-                Item itemIngredient = itemRepository.findById(ingredientDTO.getIdIngredient())
-                        .orElseThrow(() -> new Exception("El ingrediente con ID " + ingredientDTO.getIdIngredient() + " no existe"));
+                Item itemIngredient = itemRepository.findById(ingredientDTO.getId())
+                        .orElseThrow(() -> new Exception("El ingrediente con ID " + ingredientDTO.getId() + " no existe"));
                 newRecipeDetail.setItem(itemIngredient);
 
                 // Asigna la receta existente y la cantidad al detalle de la receta
@@ -340,6 +375,19 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
             return updatedItemProductDTOResult;
         } catch (Exception e) {
             throw new Exception("Error al actualizar el producto", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Item blockUnlockItem(Long id, boolean blocked) throws Exception{
+        try {
+            Item item = itemRepository.findById(id).orElseThrow(() -> new Exception("Item not found"));
+            item.setBlocked(blocked);
+            return itemRepository.save(item);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 

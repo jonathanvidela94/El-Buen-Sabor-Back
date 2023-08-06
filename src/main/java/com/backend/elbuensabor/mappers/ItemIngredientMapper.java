@@ -4,7 +4,7 @@ import com.backend.elbuensabor.DTO.ItemIngredientDTO;
 import com.backend.elbuensabor.entities.Item;
 import com.backend.elbuensabor.entities.ItemMeasurementUnit;
 import com.backend.elbuensabor.entities.MeasurementUnit;
-import com.backend.elbuensabor.services.impl.repositories.MeasurementUnitRepository;
+import com.backend.elbuensabor.repositories.MeasurementUnitRepository;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

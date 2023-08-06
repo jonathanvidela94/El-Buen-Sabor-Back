@@ -5,9 +5,9 @@ import com.backend.elbuensabor.entities.Category;
 import com.backend.elbuensabor.entities.ItemType;
 import com.backend.elbuensabor.mappers.CategoryMapper;
 import com.backend.elbuensabor.mappers.GenericMapper;
-import com.backend.elbuensabor.services.impl.repositories.CategoryRepository;
-import com.backend.elbuensabor.services.impl.repositories.GenericRepository;
-import com.backend.elbuensabor.services.impl.repositories.ItemTypeRepository;
+import com.backend.elbuensabor.repositories.CategoryRepository;
+import com.backend.elbuensabor.repositories.GenericRepository;
+import com.backend.elbuensabor.repositories.ItemTypeRepository;
 import com.backend.elbuensabor.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -145,4 +145,15 @@ public class CategoryServiceImpl extends GenericServiceImpl<Category, CategoryDT
             throw new Exception(e.getMessage());
         }
     }
+
+    public List<CategoryDTO> findCategoriesByItemTypes() throws Exception{
+        try {
+            List<Category> categories = categoryRepository.findCategoriesByItemTypes();
+            return genericMapper.toDTOsList(categories);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }

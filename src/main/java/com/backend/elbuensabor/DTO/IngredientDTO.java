@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class IngredientDTO {
-    private Long idIngredient;
+    private Long id;
     private Integer quantity;
 }
