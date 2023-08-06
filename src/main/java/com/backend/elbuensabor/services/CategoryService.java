@@ -11,8 +11,6 @@ public interface CategoryService extends GenericService<Category, CategoryDTO, L
     Category blockUnlockCategory(Long id, boolean blocked) throws Exception;
     List<CategoryDTO> findUnlockedCategoriesByItemType(Long itemTypeId) throws Exception;
     List<CategoryDTO> findUnlockedCategoriesByItemTypeExceptId(Long itemTypeId, Long id) throws Exception;
-
-    //Fixing Categories front-end :D
     List<CategoryDTO> findUnlockedCategories() throws Exception;
     List<CategoryDTO> findCategoriesByItemTypes() throws Exception;
 }
