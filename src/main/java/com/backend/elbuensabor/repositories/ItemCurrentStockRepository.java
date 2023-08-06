@@ -15,4 +15,5 @@ public interface ItemCurrentStockRepository extends GenericRepository<ItemCurren
             "                          FROM item_current_stock " +
             "                          WHERE fk_item = :itemId)", nativeQuery = true)
     Integer findLastCurrentStockByItemId(@Param("itemId") Long itemId);
+
 }

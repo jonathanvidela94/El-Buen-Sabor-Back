@@ -224,7 +224,7 @@ public class ItemIngredientServiceImpl extends GenericServiceImpl<Item, ItemIngr
                     newItemCurrentStock.setItem(updatedItem);
                     itemCurrentStockRepository.save(newItemCurrentStock);
 
-                    eventPublisher.publishEvent(new StockChangeEvent(this, updatedItem.getId(), itemIngredientDTO.getCurrentStock()));
+                    eventPublisher.publishEvent(new StockChangeEvent(this, itemIngredientDTO.getId()));
                 }
             }
 

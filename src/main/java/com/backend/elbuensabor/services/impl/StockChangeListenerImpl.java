@@ -36,31 +36,42 @@ public class StockChangeListenerImpl implements StockChangeListener {
     @EventListener
     public void handleStockChangeEvent(StockChangeEvent event) {
 
-        Long idIngredient = event.getId();
+        Long idIngredient = event.getIngredientId();
 
+        // Fetches all products that contain this ingredient
         List<Item> products = itemRepository.findProductsByIngredientId(idIngredient);
 
         for(Item product: products) {
+            // Fetches the recipe associated with this product
             Recipe recipe = recipeRepository.findByItemId(product.getId());
 
             if(recipe != null) {
+                // Fetches the details of the recipe
                 List<RecipeDetail> recipeDetails = recipeDetailRepository.findByRecipeId(recipe.getId());
 
+                // Calculates the minimum stock ratio
                 int minStockRatio = Integer.MAX_VALUE;
 
                 for(RecipeDetail recipeDetail: recipeDetails) {
                     int quantityIngredient = recipeDetail.getQuantity();
                     Item item = recipeDetail.getItem();
-                    int currentStock = itemCurrentStockRepository.findLastCurrentStockByItemId(item.getId());
-                    int stockRatio = currentStock / quantityIngredient;
+                    int currentStockIngredient = itemCurrentStockRepository.findLastCurrentStockByItemId(item.getId());
+                    int stockRatio = currentStockIngredient / quantityIngredient;
                     minStockRatio = Math.min(minStockRatio, stockRatio);
                 }
 
-                ItemCurrentStock itemCurrentStock = new ItemCurrentStock();
-                itemCurrentStock.setItem(product);
-                itemCurrentStock.setCurrentStock(minStockRatio);
-                itemCurrentStock.setCurrentStockDate(LocalDateTime.now());
-                itemCurrentStockRepository.save(itemCurrentStock);
+                // Fetches the current stock of the product
+                int currentStockProduct = itemCurrentStockRepository.findLastCurrentStockByItemId(product.getId());
+
+                // If the current product stock is not equal to the minimum stock ratio, a new current stock record is created
+                if(currentStockProduct != minStockRatio) {
+                    ItemCurrentStock itemCurrentStock = new ItemCurrentStock();
+                    itemCurrentStock.setItem(product);
+                    itemCurrentStock.setCurrentStock(minStockRatio);
+                    itemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                    itemCurrentStockRepository.save(itemCurrentStock);
+                }
+
             }
 
         }

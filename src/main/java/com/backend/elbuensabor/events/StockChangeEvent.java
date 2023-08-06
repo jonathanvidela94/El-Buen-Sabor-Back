@@ -3,21 +3,15 @@ package com.backend.elbuensabor.events;
 import org.springframework.context.ApplicationEvent;
 
 public class StockChangeEvent extends ApplicationEvent {
-    private Long id;
-    private Integer currentStock;
+    private final Long ingredientId;
 
-    public StockChangeEvent(Object source, Long id, Integer currentStock) {
+    public StockChangeEvent(Object source, Long ingredientId) {
         super(source);
-        this.id = id;
-        this.currentStock = currentStock;
+        this.ingredientId = ingredientId;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Integer getCurrentStock() {
-        return currentStock;
+    public Long getIngredientId() {
+        return ingredientId;
     }
 
 }
