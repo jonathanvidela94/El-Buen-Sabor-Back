@@ -18,9 +18,6 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     @Autowired
     private OrdersRepository ordersRepository;
 
-
-    private final OrdersMapper ordersMapper = OrdersMapper.getInstance();
-
     public OrdersServiceImpl(GenericRepository<Orders, Long> genericRepository, GenericMapper<Orders, OrdersDTO> genericMapper) {
         super(genericRepository, genericMapper);
     }
