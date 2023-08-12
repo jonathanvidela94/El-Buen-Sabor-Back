@@ -8,11 +8,14 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface OrderDetailMapper extends GenericMapper<OrderDetail, OrderDetailDTO>{
-    static OrderDetailMapper getInstance() {return Mappers.getMapper(OrderDetailMapper.class);}
 
-    @Override
-    @Mapping(target = "itemId", source = "item.id")
-    @Mapping(target = "orderId", source = "order.id")
+    static OrderDetailMapper getInstance() {
+        return Mappers.getMapper(OrderDetailMapper.class);
+    }
+
+    @Mapping(source = "source.item.id", target = "itemId")
     OrderDetailDTO toDTO(OrderDetail source);
 
+    @Mapping(target = "item", ignore = true)
+    OrderDetail toEntity(OrderDetailDTO source);
 }

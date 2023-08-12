@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -37,10 +35,10 @@ public class Orders extends GenericEntity{
     private String apartment;
 
     @Column(name = "order_date")
-    private LocalDateTime orderDate;
+    private String orderDate;
 
     @Column(name = "estimated_time")
-    private Duration estimatedTime;
+    private String estimatedTime;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_delivery_type")
