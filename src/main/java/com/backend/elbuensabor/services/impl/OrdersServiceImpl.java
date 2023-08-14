@@ -97,6 +97,50 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     }
 
     @Override
+    public List<OrdersDTO> getAllOrdersByCustomerId(Long id) throws Exception {
+
+        //Orders
+        List<Orders> orders = ordersRepository.findAllByCustomerId(id);
+        List<OrdersDTO> ordersDTOList = new ArrayList<>();
+
+        for (Orders order: orders) {
+            OrdersDTO ordersDTO = this.ordersMapper.toDTO(order);
+
+            //OrderDetail
+            List<OrderDetail> orderDetails = order.getOrderDetails();
+            List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+
+            for (OrderDetail detail: orderDetails) {
+                OrderDetailDTO detailDTO = this.orderDetailMapper.toDTO(detail);
+
+                Item item = detail.getItem();
+
+                //Products
+                if (item.getItemType().getId() == 2){
+                    detailDTO.setQuantity(detail.getQuantity());
+                    detailDTO.setSubtotal(detail.getSubtotal());
+                    ItemProductDTO itemProductDTO = itemProductService.getItemProduct(detail.getItem().getId());
+                    detailDTO.setItemProduct(itemProductDTO);
+
+                    //Drinks
+                } else if (item.getItemType().getId() == 3){
+                    detailDTO.setQuantity(detail.getQuantity());
+                    detailDTO.setSubtotal(detail.getSubtotal());
+                    ItemDrinkDTO itemDrinkDTO = itemDrinkService.getItemDrink(detail.getItem().getId());
+                    detailDTO.setItemDrink(itemDrinkDTO);
+                }
+
+                //Add item info to OrderDetail
+                orderDetailDTOList.add(detailDTO);
+            }
+
+            ordersDTO.setOrderDetails(orderDetailDTOList);
+            ordersDTOList.add(ordersDTO);
+        }
+        return ordersDTOList;
+    }
+
+    @Override
     public OrdersDTO getOrder(Long id) throws Exception {
 
         Orders order = ordersRepository.findById(id)

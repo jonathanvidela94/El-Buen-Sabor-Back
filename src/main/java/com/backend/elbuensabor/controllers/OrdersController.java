@@ -39,6 +39,15 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
         }
     }
 
+    @GetMapping("/{id}/purchase-history")
+    public ResponseEntity<?> getAllByCustomerId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.getAllOrdersByCustomerId(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
     @Override
     @PostMapping(value = "")
     public ResponseEntity<?> save(@RequestBody OrdersDTO dto) {
