@@ -7,4 +7,6 @@ public class OrderDetailDTO extends GenericDTO{
     private Integer quantity;
     private Double subtotal;
     private Long itemId;
+    private ItemProductDTO itemProduct;
+    private ItemDrinkDTO itemDrink;
 }

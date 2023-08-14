@@ -1,7 +1,6 @@
 package com.backend.elbuensabor.services.impl;
 
-import com.backend.elbuensabor.DTO.OrderDetailDTO;
-import com.backend.elbuensabor.DTO.OrdersDTO;
+import com.backend.elbuensabor.DTO.*;
 import com.backend.elbuensabor.entities.*;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.OrderDetailMapper;
@@ -11,6 +10,7 @@ import com.backend.elbuensabor.services.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +38,12 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     @Autowired
     ItemRepository itemRepository;
 
+    @Autowired
+    ItemProductServiceImpl itemProductService;
+
+    @Autowired
+    ItemDrinkServiceImpl itemDrinkService;
+
     private final OrdersMapper ordersMapper = OrdersMapper.getInstance();
 
     private final OrderDetailMapper orderDetailMapper = OrderDetailMapper.getInstance();
@@ -49,15 +55,84 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     @Override
     public List<OrdersDTO> getAllOrders() throws Exception {
 
+        //Orders
         List<Orders> orders = ordersRepository.findAll();
         List<OrdersDTO> ordersDTOList = new ArrayList<>();
 
+        for (Orders order: orders) {
+            OrdersDTO ordersDTO = this.ordersMapper.toDTO(order);
+
+            //OrderDetail
+            List<OrderDetail> orderDetails = order.getOrderDetails();
+            List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+
+            for (OrderDetail detail: orderDetails) {
+                OrderDetailDTO detailDTO = this.orderDetailMapper.toDTO(detail);
+
+                Item item = detail.getItem();
+
+                //Products
+                if (item.getItemType().getId() == 2){
+                    detailDTO.setQuantity(detail.getQuantity());
+                    detailDTO.setSubtotal(detail.getSubtotal());
+                    ItemProductDTO itemProductDTO = itemProductService.getItemProduct(detail.getItem().getId());
+                    detailDTO.setItemProduct(itemProductDTO);
+
+                //Drinks
+                } else if (item.getItemType().getId() == 3){
+                    detailDTO.setQuantity(detail.getQuantity());
+                    detailDTO.setSubtotal(detail.getSubtotal());
+                    ItemDrinkDTO itemDrinkDTO = itemDrinkService.getItemDrink(detail.getItem().getId());
+                    detailDTO.setItemDrink(itemDrinkDTO);
+                }
+
+                //Add item info to OrderDetail
+                orderDetailDTOList.add(detailDTO);
+            }
+
+            ordersDTO.setOrderDetails(orderDetailDTOList);
+            ordersDTOList.add(ordersDTO);
+        }
         return ordersDTOList;
     }
 
     @Override
     public OrdersDTO getOrder(Long id) throws Exception {
-        return null;
+
+        Orders order = ordersRepository.findById(id)
+                .orElseThrow(() -> new Exception("Producto no encontrado con el ID: " + id));
+
+        OrdersDTO ordersDTO = ordersMapper.toDTO(order);
+
+        //OrderDetail
+        List<OrderDetail> orderDetails = order.getOrderDetails();
+        List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+
+        for (OrderDetail detail: orderDetails) {
+            OrderDetailDTO detailDTO = this.orderDetailMapper.toDTO(detail);
+
+            Item item = detail.getItem();
+
+            //Products
+            if (item.getItemType().getId() == 2){
+                detailDTO.setQuantity(detail.getQuantity());
+                detailDTO.setSubtotal(detail.getSubtotal());
+                ItemProductDTO itemProductDTO = itemProductService.getItemProduct(detail.getItem().getId());
+                detailDTO.setItemProduct(itemProductDTO);
+
+                //Drinks
+            } else if (item.getItemType().getId() == 3){
+                detailDTO.setQuantity(detail.getQuantity());
+                detailDTO.setSubtotal(detail.getSubtotal());
+                ItemDrinkDTO itemDrinkDTO = itemDrinkService.getItemDrink(detail.getItem().getId());
+                detailDTO.setItemDrink(itemDrinkDTO);
+            }
+            //Add item info to OrderDetail
+            orderDetailDTOList.add(detailDTO);
+        }
+        ordersDTO.setOrderDetails(orderDetailDTOList);
+
+        return ordersDTO;
     }
 
     @Override
@@ -108,6 +183,9 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
 
         Orders saveOrder = ordersRepository.save(order);
 
+        //Order Date
+        saveOrder.setOrderDate(LocalDateTime.now());
+
         //Order Detail
         OrderDetail orderDetail;
         for (OrderDetailDTO orderDetailDTO : dto.getOrderDetails()){
@@ -136,6 +214,25 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
 
     @Override
     public OrdersDTO updateOrder(Long id, OrdersDTO dto) throws Exception {
-        return null;
+
+        Orders order = ordersRepository.findById(id)
+                .orElseThrow(() -> new Exception("Producto no encontrado con el ID: " + id));
+
+        //Paid
+        order.setPaid(dto.isPaid());
+
+        //Order Status
+        if (dto.getOrderStatusId() != null) {
+            if (orderStatusRepository.existsById(dto.getOrderStatusId())) {
+                OrderStatus orderStatus = orderStatusRepository.findById(dto.getOrderStatusId()).get();
+                order.setOrderStatus(orderStatus);
+            } else {
+                throw new Exception("El estado de orden no existe");
+            }
+        }
+
+        Orders updateOrder = ordersRepository.save(order);
+
+        return ordersMapper.toDTO(updateOrder);
     }
 }
