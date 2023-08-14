@@ -2,7 +2,6 @@ package com.backend.elbuensabor.DTO;
 
 import lombok.Data;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 @Data
@@ -10,7 +9,7 @@ public class OrdersDTO extends GenericDTO{
     private String address;
     private String apartment;
     private Double discount;
-    private Duration estimatedTime;
+    private String estimatedTime;
     private LocalDateTime orderDate;
     private boolean paid;
     private String phone;

@@ -1,12 +1,13 @@
 package com.backend.elbuensabor.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class Orders extends GenericEntity{
     private LocalDateTime orderDate;
 
     @Column(name = "estimated_time")
-    private Duration estimatedTime;
+    private String estimatedTime;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_delivery_type")
@@ -55,9 +56,11 @@ public class Orders extends GenericEntity{
     private OrderStatus orderStatus;
 
     @OneToMany(mappedBy="order", cascade=CascadeType.ALL)
+    @JsonManagedReference
     private List<OrderDetail> orderDetails;
 
     @ManyToOne
     @JoinColumn(name = "fk_customer")
+    @JsonBackReference
     private Customer customer;
 }
