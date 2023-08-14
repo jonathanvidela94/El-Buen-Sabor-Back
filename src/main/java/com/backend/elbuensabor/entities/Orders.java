@@ -61,6 +61,5 @@ public class Orders extends GenericEntity{
 
     @ManyToOne
     @JoinColumn(name = "fk_customer")
-    @JsonBackReference
     private Customer customer;
 }

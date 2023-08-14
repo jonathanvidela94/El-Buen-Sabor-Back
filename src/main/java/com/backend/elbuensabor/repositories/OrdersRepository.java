@@ -12,4 +12,7 @@ public interface OrdersRepository extends GenericRepository<Orders, Long>{
     @EntityGraph(attributePaths = {"orderDetails", "orderDetails.item"})
     List<Orders> findAll();
 
+    @EntityGraph(attributePaths = {"orderDetails", "orderDetails.item"})
+    List<Orders> findAllByCustomerId(Long id);
+
 }

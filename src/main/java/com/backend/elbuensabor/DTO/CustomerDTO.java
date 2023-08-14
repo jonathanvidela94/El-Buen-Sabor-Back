@@ -14,5 +14,5 @@ public class CustomerDTO extends GenericDTO {
     private String address;
     private String apartment;
     private User user;
-    private List<Orders> orders;
+    List<Long> orderIds;
 }
