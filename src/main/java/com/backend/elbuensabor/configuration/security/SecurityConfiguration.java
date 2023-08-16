@@ -38,9 +38,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                .requestMatchers("/api/v1/public").permitAll()
-                .requestMatchers("/**").authenticated()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/api/v1/public/**").permitAll()
+                .anyRequest().authenticated()
                 .and().cors().configurationSource(corsConfigurationSource())
                 .and().oauth2ResourceServer()
                 .jwt()
@@ -55,7 +55,7 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Requestor-Type", "X-Get-Reader", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Requestor-Type", "X-Get-Reader", "Content-Type"));
         configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

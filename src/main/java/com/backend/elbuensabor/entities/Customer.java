@@ -1,6 +1,6 @@
 package com.backend.elbuensabor.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +32,7 @@ public class Customer extends GenericEntity{
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
+    @JsonBackReference
     private List<Orders> orders;
 
 }
