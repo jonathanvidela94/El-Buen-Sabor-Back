@@ -1,6 +1,5 @@
 package com.backend.elbuensabor.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -61,5 +60,6 @@ public class Orders extends GenericEntity{
 
     @ManyToOne
     @JoinColumn(name = "fk_customer")
+    @JsonManagedReference
     private Customer customer;
 }
