@@ -17,6 +17,8 @@ public interface OrdersMapper extends GenericMapper<Orders, OrdersDTO>{
     @Mapping(source = "source.orderStatus.id", target = "orderStatusId")
     @Mapping(source = "source.paymentType.id", target = "paymentTypeId")
     @Mapping(source = "source.customer.id", target = "customerId")
+    @Mapping(source = "source.customer.name", target = "customerName")
+    @Mapping(source = "source.customer.lastname", target = "customerLastname")
     OrdersDTO toDTO(Orders source);
 
     @Mapping(target = "deliveryType", ignore = true)

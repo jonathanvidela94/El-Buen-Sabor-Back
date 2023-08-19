@@ -19,6 +19,4 @@ import java.time.Duration;
 public class OrderStatus extends GenericEntity{
     @Column(name = "denomination")
     private String denomination;
-    @Column(name = "duration")
-    private Duration duration;
 }
