@@ -21,6 +21,9 @@ public class Orders extends GenericEntity{
     @Column(name = "paid")
     private boolean paid;
 
+    @Column(name = "cancelled")
+    private boolean cancelled;
+
     @Column(name = "total")
     private Double total;
 

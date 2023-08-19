@@ -265,6 +265,9 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
         //Paid
         order.setPaid(dto.isPaid());
 
+        //Cancel
+        order.setCancelled(dto.isCancelled());
+
         //Order Status
         if (dto.getOrderStatusId() != null) {
             if (orderStatusRepository.existsById(dto.getOrderStatusId())) {

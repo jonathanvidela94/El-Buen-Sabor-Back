@@ -12,9 +12,12 @@ public class OrdersDTO extends GenericDTO{
     private String estimatedTime;
     private LocalDateTime orderDate;
     private boolean paid;
+    private boolean cancelled;
     private String phone;
     private Double total;
     private Long customerId;
+    private String customerName;
+    private String customerLastname;
     private Long deliveryTypeId;
     private Long orderStatusId;
     private Long paymentTypeId;
