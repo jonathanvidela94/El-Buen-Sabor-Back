@@ -39,6 +39,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categories/filter/ingredients").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/drinks").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .anyRequest().authenticated()
                 .and().cors().configurationSource(corsConfigurationSource())

@@ -43,7 +43,7 @@ public class Orders extends GenericEntity{
     private LocalDateTime orderDate;
 
     @Column(name = "estimated_time")
-    private String estimatedTime;
+    private Integer estimatedTime;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_delivery_type")
