@@ -9,7 +9,7 @@ public class OrdersDTO extends GenericDTO{
     private String address;
     private String apartment;
     private Double discount;
-    private String estimatedTime;
+    private Integer estimatedTime;
     private LocalDateTime orderDate;
     private boolean paid;
     private boolean cancelled;

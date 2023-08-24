@@ -268,6 +268,9 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
         //Cancel
         order.setCancelled(dto.isCancelled());
 
+        //Estimated Time
+        order.setEstimatedTime(dto.getEstimatedTime());
+
         //Order Status
         if (dto.getOrderStatusId() != null) {
             if (orderStatusRepository.existsById(dto.getOrderStatusId())) {
