@@ -55,4 +55,15 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, CustomerDT
             throw new Exception(e.getMessage());
         }
     }
+
+    @Override
+    public List<CustomerDTO> findAllLoggedCocinero() throws Exception {
+        try {
+            List<Customer> customers = customerRepository.findAllLoggedCocinero();
+            return genericMapper.toDTOsList(customers);
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }

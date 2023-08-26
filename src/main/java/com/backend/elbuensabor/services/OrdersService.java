@@ -12,5 +12,5 @@ public interface OrdersService extends GenericService<Orders, OrdersDTO,Long>{
     OrdersDTO getOrder(Long id) throws Exception;
     Orders saveOrder(OrdersDTO dto) throws Exception;
     OrdersDTO updateOrder(Long id, OrdersDTO dto) throws Exception;
-
+    OrdersDTO cancelOrder(Long id, OrdersDTO dto) throws Exception;
 }

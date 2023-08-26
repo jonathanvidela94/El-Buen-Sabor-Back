@@ -6,4 +6,5 @@ import lombok.Data;
 public class IngredientDTO {
     private Long id;
     private Integer quantity;
+    private Integer currentStock;
 }

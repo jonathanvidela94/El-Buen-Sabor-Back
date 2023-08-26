@@ -37,4 +37,26 @@ public class UserServiceImpl extends GenericServiceImpl<User, UserDTO, Long> imp
     public boolean checkEmailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
+
+    @Override
+    public void connected(String auth0) throws Exception {
+        try {
+            User user = userRepository.findByAuth0Id(auth0).orElseThrow(() -> new Exception("User not found"));
+            user.setLogged(true);
+            userRepository.save(user);
+        }catch (Exception e){
+            throw  new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public void disconnected(String auth0) throws Exception {
+        try {
+            User user = userRepository.findByAuth0Id(auth0).orElseThrow(() -> new Exception("User not found"));
+            user.setLogged(false);
+            userRepository.save(user);
+        }catch (Exception e){
+            throw  new Exception(e.getMessage());
+        }
+    }
 }
