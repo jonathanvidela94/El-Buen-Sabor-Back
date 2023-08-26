@@ -19,6 +19,8 @@ public class User extends GenericEntity{
     private String email;
     @Column(name = "blocked")
     private boolean blocked;
+    @Column(name = "logged")
+    private boolean logged;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fk_role")

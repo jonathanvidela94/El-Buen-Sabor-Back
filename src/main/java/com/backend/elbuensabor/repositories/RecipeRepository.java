@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface RecipeRepository extends GenericRepository<Recipe, Long>{
     @Query(value = "SELECT * FROM recipe r WHERE r.fk_item = :itemId", nativeQuery = true)
     Recipe findByItemId(@Param("itemId") Long itemId);
+
 }

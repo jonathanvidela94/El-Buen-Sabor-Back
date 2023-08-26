@@ -80,6 +80,12 @@ public class ItemProductServiceImpl extends GenericServiceImpl<Item, ItemProduct
                     IngredientDTO ingredientDTO = new IngredientDTO();
                     ingredientDTO.setId(recipeDetail.getItem().getId());
                     ingredientDTO.setQuantity(recipeDetail.getQuantity());
+                    ItemCurrentStock ingredientCurrentStock = itemCurrentStockRepository.findLatestByItemId(recipeDetail.getItem().getId());
+                    if (ingredientCurrentStock != null) {
+                        ingredientDTO.setCurrentStock(ingredientCurrentStock.getCurrentStock());
+                    } else {
+                        ingredientDTO.setCurrentStock(0);
+                    }
                     ingredientDTOList.add(ingredientDTO);
                 }
                 itemProductDTO.setIngredients(ingredientDTOList);

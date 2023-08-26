@@ -68,4 +68,13 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
         }
     }
 
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<?> cancel(@PathVariable Long id, @RequestBody OrdersDTO dto) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.cancelOrder(id, dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
 }

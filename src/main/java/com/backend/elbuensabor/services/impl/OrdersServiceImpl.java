@@ -2,12 +2,14 @@ package com.backend.elbuensabor.services.impl;
 
 import com.backend.elbuensabor.DTO.*;
 import com.backend.elbuensabor.entities.*;
+import com.backend.elbuensabor.events.StockChangeEvent;
 import com.backend.elbuensabor.mappers.GenericMapper;
 import com.backend.elbuensabor.mappers.OrderDetailMapper;
 import com.backend.elbuensabor.mappers.OrdersMapper;
 import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,6 +39,15 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
 
     @Autowired
     ItemRepository itemRepository;
+
+    @Autowired
+    RecipeRepository recipeRepository;
+
+    @Autowired
+    ItemCurrentStockRepository itemCurrentStockRepository;
+
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
 
     @Autowired
     ItemProductServiceImpl itemProductService;
@@ -230,6 +241,9 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
         //Order Date
         saveOrder.setOrderDate(LocalDateTime.now());
 
+        //Estimated Time init
+        int orderPrepTime = 0;
+
         //Order Detail
         OrderDetail orderDetail;
         for (OrderDetailDTO orderDetailDTO : dto.getOrderDetails()){
@@ -243,6 +257,56 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
                 throw new Exception("Item invalido o no existente");
             }
 
+            //Prep Time & Stock update
+            //Food
+            if (item.getItemType().getId() == 2){
+                Recipe recipe = recipeRepository.findByItemId(item.getId());
+                Integer itemPrepTime = recipe.getPreparationTime();
+
+                //Get Max prepTime inside orderDetail
+                if(itemPrepTime > orderPrepTime) {
+                    orderPrepTime = itemPrepTime;
+                }
+
+                //New Stock for Food products
+                for (RecipeDetail recipeDetail: recipe.getRecipeDetails()) {
+
+                    int totalQuantityUsed = recipeDetail.getQuantity() * orderDetail.getQuantity();
+                    ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(recipeDetail.getItem().getId());
+
+                    // Subtract "-"
+                    int newCurrentStock = latestItemCurrentStock.getCurrentStock() - totalQuantityUsed;
+
+                    if (newCurrentStock != latestItemCurrentStock.getCurrentStock()) {
+                        ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                        newItemCurrentStock.setCurrentStock(newCurrentStock);
+                        newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                        newItemCurrentStock.setItem(recipeDetail.getItem());
+                        itemCurrentStockRepository.save(newItemCurrentStock);
+
+                        eventPublisher.publishEvent(new StockChangeEvent(this, recipeDetail.getItem().getId()));
+                    }
+
+                }
+
+                //Drinks
+            } else {
+
+                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                int totalQuantityUsed = orderDetail.getQuantity();
+
+                // Subtract "-"
+                int newCurrentStock = latestItemCurrentStock.getCurrentStock() - totalQuantityUsed;
+
+                if (newCurrentStock != latestItemCurrentStock.getCurrentStock()) {
+                    ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                    newItemCurrentStock.setCurrentStock(newCurrentStock);
+                    newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                    newItemCurrentStock.setItem(item);
+                    itemCurrentStockRepository.save(newItemCurrentStock);
+                }
+            }
+
             //Item on Details
             orderDetail.setItem(item);
 
@@ -252,6 +316,38 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
             //Save OrderDetail
             orderDetailRepository.save(orderDetail);
         }
+
+        //Get all orders on kitchen
+        List<Orders> ordersKitchen = ordersRepository.findAllByOrderStatusId(2L);
+        int ordersOnKitchenPrepTime = 0;
+        for (Orders ordKit: ordersKitchen) {
+            ordersOnKitchenPrepTime += ordKit.getEstimatedTime();
+        }
+
+        //Get all Cooks who are working now
+        List<Customer> cooksList = customerRepository.findAllLoggedCocinero();
+        int cooks = 0;
+
+        //Avoid dividing by 0
+        if (!cooksList.isEmpty()) {
+            cooks = cooksList.size();
+        } else {
+            cooks = 1;
+        }
+
+        //Calculation of Estimated Time of the order
+        orderPrepTime = (orderPrepTime + (ordersOnKitchenPrepTime / cooks));
+
+        //Delivery
+        if (saveOrder.getDeliveryType().getId() == 1){
+            orderPrepTime += 10;
+        }
+
+        //Estimated Time
+        saveOrder.setEstimatedTime(orderPrepTime);
+
+        //Update order with Estimated Time
+        saveOrder = ordersRepository.save(saveOrder);
 
         return saveOrder;
     }
@@ -264,9 +360,6 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
 
         //Paid
         order.setPaid(dto.isPaid());
-
-        //Cancel
-        order.setCancelled(dto.isCancelled());
 
         //Estimated Time
         order.setEstimatedTime(dto.getEstimatedTime());
@@ -284,5 +377,86 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
         Orders updateOrder = ordersRepository.save(order);
 
         return ordersMapper.toDTO(updateOrder);
+    }
+
+    @Override
+    public OrdersDTO cancelOrder(Long id, OrdersDTO dto) throws Exception {
+        Orders order = ordersRepository.findById(id)
+                .orElseThrow(() -> new Exception("Producto no encontrado con el ID: " + id));
+
+        //Cancel
+        order.setCancelled(dto.isCancelled());
+
+        //Order Status
+        if (dto.getOrderStatusId() != null) {
+            if (orderStatusRepository.existsById(dto.getOrderStatusId())) {
+                OrderStatus orderStatus = orderStatusRepository.findById(dto.getOrderStatusId()).get();
+                order.setOrderStatus(orderStatus);
+            } else {
+                throw new Exception("El estado de orden no existe");
+            }
+        }
+
+        //Order Detail
+        OrderDetail orderDetail;
+        for (OrderDetailDTO orderDetailDTO : dto.getOrderDetails()){
+            orderDetail = orderDetailMapper.toEntity(orderDetailDTO);
+
+            //Item
+            Item item = null;
+            if(orderDetailDTO.getItemId() != null && itemRepository.existsById(orderDetailDTO.getItemId())){
+                item = itemRepository.findById(orderDetailDTO.getItemId()).get();
+            } else {
+                throw new Exception("Item invalido o no existente");
+            }
+
+            //Prep Time & Stock update
+            //Food
+            if (item.getItemType().getId() == 2){
+                Recipe recipe = recipeRepository.findByItemId(item.getId());
+
+                //New Stock for Food products
+                for (RecipeDetail recipeDetail: recipe.getRecipeDetails()) {
+
+                    int totalQuantityUsed = recipeDetail.getQuantity() * orderDetail.getQuantity();
+                    ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(recipeDetail.getItem().getId());
+
+                    // Sum "+"
+                    int newCurrentStock = latestItemCurrentStock.getCurrentStock() + totalQuantityUsed;
+
+                    if (newCurrentStock != latestItemCurrentStock.getCurrentStock()) {
+                        ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                        newItemCurrentStock.setCurrentStock(newCurrentStock);
+                        newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                        newItemCurrentStock.setItem(recipeDetail.getItem());
+                        itemCurrentStockRepository.save(newItemCurrentStock);
+
+                        eventPublisher.publishEvent(new StockChangeEvent(this, recipeDetail.getItem().getId()));
+                    }
+
+                }
+
+                //Drinks
+            } else {
+
+                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                int totalQuantityUsed = orderDetail.getQuantity();
+
+                // Sum "+"
+                int newCurrentStock = latestItemCurrentStock.getCurrentStock() + totalQuantityUsed;
+
+                if (newCurrentStock != latestItemCurrentStock.getCurrentStock()) {
+                    ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                    newItemCurrentStock.setCurrentStock(newCurrentStock);
+                    newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                    newItemCurrentStock.setItem(item);
+                    itemCurrentStockRepository.save(newItemCurrentStock);
+                }
+            }
+        }
+
+        Orders cancelOrder = ordersRepository.save(order);
+
+        return ordersMapper.toDTO(cancelOrder);
     }
 }

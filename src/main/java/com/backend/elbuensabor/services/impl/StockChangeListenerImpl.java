@@ -71,11 +71,7 @@ public class StockChangeListenerImpl implements StockChangeListener {
                     itemCurrentStock.setCurrentStockDate(LocalDateTime.now());
                     itemCurrentStockRepository.save(itemCurrentStock);
                 }
-
             }
-
         }
-
     }
-
 }
