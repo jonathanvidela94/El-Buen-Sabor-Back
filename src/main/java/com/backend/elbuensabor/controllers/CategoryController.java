@@ -69,7 +69,7 @@ public class CategoryController extends GenericControllerImpl<Category, Category
     @GetMapping("/filter")
     public ResponseEntity<?> findUnlockedCategories(){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(service.findUnlockedCategories());
+            return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }

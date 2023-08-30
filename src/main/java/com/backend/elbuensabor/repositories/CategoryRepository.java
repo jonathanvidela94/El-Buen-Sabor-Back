@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends GenericRepository<Category,Long>{
-    @Query(value = "SELECT * FROM category WHERE blocked = false AND fk_item_type = :itemTypeId", nativeQuery = true)
+    @Query(value = "SELECT * FROM category WHERE fk_item_type = :itemTypeId", nativeQuery = true)
     List<Category> findUnlockedCategoriesByItemType(@Param("itemTypeId") Long itemTypeId);
     @Query (value = "SELECT * FROM category WHERE blocked = false AND fk_item_type = :itemTypeId AND id != :id", nativeQuery = true)
     List<Category> findUnlockedCategoriesByItemTypeExceptId(@Param("itemTypeId") Long itemTypeId, @Param("id") Long id);
