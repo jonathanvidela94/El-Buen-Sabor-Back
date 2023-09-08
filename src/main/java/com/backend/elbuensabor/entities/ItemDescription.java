@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDescription extends GenericEntity{
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne(optional = false)

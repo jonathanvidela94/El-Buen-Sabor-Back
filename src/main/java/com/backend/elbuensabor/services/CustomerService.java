@@ -9,4 +9,5 @@ public interface CustomerService extends GenericService<Customer, CustomerDTO, L
     List<CustomerDTO> findAllCustomersWithDifferentRoleId(Long roleId) throws Exception;
     CustomerDTO findCustomerByUserAuth0Id(String auth0Id) throws Exception;
     List<CustomerDTO> findAllCustomersWithRoleCliente() throws Exception;
+    List<CustomerDTO> findAllLoggedCocinero() throws Exception;
 }
