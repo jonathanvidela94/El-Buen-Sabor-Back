@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -462,7 +463,7 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     }
 
     @Override
-    public List<CustomerSummaryDTO> getCustomerSummaryBetweenDates(Date startDate, Date endDate) throws Exception {
+    public List<CustomerSummaryDTO> getCustomerSummaryBetweenDates(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         try {
             List<CustomerSummaryDTO> customerSummaryDTOList = ordersRepository.getCustomerSummaryBetweenDates(startDate, endDate);
             return customerSummaryDTOList;
@@ -472,12 +473,11 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     }
 
     @Override
-    public List<ItemSalesDTO>getItemsWithSoldQuantitiesBetweenDates(Date startDate, Date endDate) throws Exception {
+    public List<ItemSalesDTO>getItemsWithSoldQuantitiesBetweenDates(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         try {
-            List<ItemSalesDTO> itemSalesDTOS = ordersRepository.getItemsWithSoldQuantitiesAndOrderTypeAndDateRange(startDate, endDate);
-            return itemSalesDTOS;
+            return ordersRepository.getItemsWithSoldQuantitiesBetweenDates(startDate, endDate);
         } catch (Exception e) {
-            throw new Exception("Ha ocurrido un error al obtener el resumen de productos vendidos");
+            throw new Exception(e.getMessage());
         }
     }
 

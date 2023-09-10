@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @RestController
@@ -82,10 +84,12 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
 
     @GetMapping("/customerRanking")
     public ResponseEntity<?> getCustomerSummaryBetweenDates(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(service.getCustomerSummaryBetweenDates(startDate, endDate));
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+            return ResponseEntity.status(HttpStatus.OK).body(service.getCustomerSummaryBetweenDates(startDateTime, endDateTime));
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
@@ -94,12 +98,16 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
 
     @GetMapping("/itemsRanking")
     public ResponseEntity<?> getItemsWithSoldQuantitiesBetweenDates(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(service.getItemsWithSoldQuantitiesBetweenDates(startDate, endDate));
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+            return ResponseEntity.status(HttpStatus.OK).body(service.getItemsWithSoldQuantitiesBetweenDates(startDateTime, endDateTime));
         }
         catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }
     }
