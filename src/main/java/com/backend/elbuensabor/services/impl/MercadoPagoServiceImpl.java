@@ -26,7 +26,6 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
     @PostConstruct
     public void initMPConfig(){
         MercadoPagoConfig.setAccessToken(accesTokenMercadoPago);
-        System.out.println("Access Token: " + accesTokenMercadoPago);
     }
 
     @Override
