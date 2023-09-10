@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -459,4 +461,24 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
 
         return ordersMapper.toDTO(cancelOrder);
     }
+
+    @Override
+    public List<CustomerSummaryDTO> getCustomerSummaryBetweenDates(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+        try {
+            List<CustomerSummaryDTO> customerSummaryDTOList = ordersRepository.getCustomerSummaryBetweenDates(startDate, endDate);
+            return customerSummaryDTOList;
+        } catch (Exception e) {
+            throw new Exception("Ha ocurrido un error al obtener el resumen de clientes");
+        }
+    }
+
+    @Override
+    public List<ItemSalesDTO>getItemsWithSoldQuantitiesBetweenDates(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+        try {
+            return ordersRepository.getItemsWithSoldQuantitiesBetweenDates(startDate, endDate);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }

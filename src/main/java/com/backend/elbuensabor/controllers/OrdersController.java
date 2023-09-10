@@ -5,9 +5,14 @@ import com.backend.elbuensabor.controllers.impl.GenericControllerImpl;
 import com.backend.elbuensabor.entities.Orders;
 import com.backend.elbuensabor.services.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -73,6 +78,36 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.cancelOrder(id, dto));
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
+    @GetMapping("/customerRanking")
+    public ResponseEntity<?> getCustomerSummaryBetweenDates(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        try {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+            return ResponseEntity.status(HttpStatus.OK).body(service.getCustomerSummaryBetweenDates(startDateTime, endDateTime));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
+    @GetMapping("/itemsRanking")
+    public ResponseEntity<?> getItemsWithSoldQuantitiesBetweenDates(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        try {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+            return ResponseEntity.status(HttpStatus.OK).body(service.getItemsWithSoldQuantitiesBetweenDates(startDateTime, endDateTime));
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
         }
     }
