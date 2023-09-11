@@ -8,6 +8,7 @@ import com.backend.elbuensabor.mappers.OrderDetailMapper;
 import com.backend.elbuensabor.mappers.OrdersMapper;
 import com.backend.elbuensabor.repositories.*;
 import com.backend.elbuensabor.services.OrdersService;
+import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -478,6 +479,23 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
             return ordersRepository.getItemsWithSoldQuantitiesBetweenDates(startDate, endDate);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public MonetaryMovementsDTO getMonetaryMovementsBetweenDates(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+        List<Tuple> result = ordersRepository.getMonetaryMovementsBetweenDates(startDate, endDate);
+
+        if (result != null && !result.isEmpty()) {
+            Tuple tuple = result.get(0);
+
+            Double ingresos = tuple.get(0, Double.class);
+            Double costos = tuple.get(1, Double.class);
+            Double ganancias = tuple.get(2, Double.class);
+
+            return new MonetaryMovementsDTO(ingresos, costos, ganancias);
+        } else {
+            throw new Exception("No se encontraron resultados.");
         }
     }
 
