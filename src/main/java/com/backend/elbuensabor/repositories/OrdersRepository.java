@@ -2,7 +2,9 @@ package com.backend.elbuensabor.repositories;
 
 import com.backend.elbuensabor.DTO.CustomerSummaryDTO;
 import com.backend.elbuensabor.DTO.ItemSalesDTO;
+import com.backend.elbuensabor.DTO.MonetaryMovementsDTO;
 import com.backend.elbuensabor.entities.Orders;
+import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface OrdersRepository extends GenericRepository<Orders, Long>{
+public interface OrdersRepository extends GenericRepository<Orders, Long> {
 
     @EntityGraph(attributePaths = {"orderDetails", "orderDetails.item"})
     List<Orders> findAll();
@@ -43,5 +45,28 @@ public interface OrdersRepository extends GenericRepository<Orders, Long>{
             "GROUP BY od.item.id, od.item.name, od.item.itemType.id " +
             "ORDER BY SUM(od.quantity) DESC")
     List<ItemSalesDTO> getItemsWithSoldQuantitiesBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query(nativeQuery = true, value = "SELECT SUM(o.total - o.discount) AS Ingresos, " +
+            "SUM((SELECT SUM(od.quantity * (SELECT SUM(rd.quantity * icp.cost_price) " +
+            "FROM recipe_detail rd " +
+            "INNER JOIN item_cost_price icp ON rd.fk_item = icp.fk_item " +
+            "WHERE rd.fk_recipe = r.id)) " +
+            "FROM order_detail od " +
+            "INNER JOIN recipe r ON od.fk_item = r.fk_item " +
+            "WHERE od.fk_order = o.id)) AS Costos, " +
+            "SUM(o.total - o.discount) - SUM((SELECT SUM(od.quantity * (SELECT SUM(rd.quantity * icp.cost_price) " +
+            "FROM recipe_detail rd " +
+            "INNER JOIN item_cost_price icp ON rd.fk_item = icp.fk_item " +
+            "WHERE rd.fk_recipe = r.id)) " +
+            "FROM order_detail od " +
+            "INNER JOIN recipe r ON od.fk_item = r.fk_item " +
+            "WHERE od.fk_order = o.id)) AS Ganancias " +
+            "FROM orders o " +
+            "WHERE o.fk_order_status = 5 " +
+            "AND o.order_date BETWEEN :startDate AND :endDate")
+    List<Tuple> getMonetaryMovementsBetweenDates(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 }

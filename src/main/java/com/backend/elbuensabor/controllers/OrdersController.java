@@ -112,4 +112,20 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
         }
     }
 
+    @GetMapping("/monetaryMovements")
+    public ResponseEntity<?> getMonetaryMovementsBetweenDates(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        try {
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+            return ResponseEntity.status(HttpStatus.OK).body(service.getMonetaryMovementsBetweenDates(startDateTime, endDateTime));
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+        }
+    }
+
 }
