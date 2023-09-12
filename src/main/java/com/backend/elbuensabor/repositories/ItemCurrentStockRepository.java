@@ -13,7 +13,8 @@ public interface ItemCurrentStockRepository extends GenericRepository<ItemCurren
             "WHERE fk_item = :itemId " +
             "AND current_stock_date = (SELECT MAX(current_stock_date) " +
             "                          FROM item_current_stock " +
-            "                          WHERE fk_item = :itemId)", nativeQuery = true)
+            "                          WHERE fk_item = :itemId) " +
+            "ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Integer findLastCurrentStockByItemId(@Param("itemId") Long itemId);
 
 }

@@ -59,7 +59,8 @@ public class OrdersController extends GenericControllerImpl<Orders, OrdersDTO> {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.saveOrder(dto));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_MESSAGE);
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
