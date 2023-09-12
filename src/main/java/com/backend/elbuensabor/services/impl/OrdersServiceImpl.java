@@ -196,86 +196,108 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
     @Override
     public Orders saveOrder(OrdersDTO dto) throws Exception {
 
-        // Convertir DTO a entidad
-        Orders order = ordersMapper.toEntity(dto);
+        try {
+            // Convertir DTO a entidad
+            Orders order = ordersMapper.toEntity(dto);
 
-        //Customer
-        if (dto.getCustomerId() != null) {
-            if (customerRepository.existsById(dto.getCustomerId())) {
-                Customer customer = customerRepository.findById(dto.getCustomerId()).get();
-                order.setCustomer(customer);
-            } else {
-                throw new Exception("El cliente no existe");
-            }
-        }
-
-        //Delivery Type
-        if (dto.getDeliveryTypeId() != null) {
-            if (deliveryTypeRepository.existsById(dto.getDeliveryTypeId())) {
-                DeliveryType deliveryType = deliveryTypeRepository.findById(dto.getDeliveryTypeId()).get();
-                order.setDeliveryType(deliveryType);
-            } else {
-                throw new Exception("El tipo de delivery no existe");
-            }
-        }
-
-        //PaymentType
-        if (dto.getPaymentTypeId() != null) {
-            if (paymentTypeRepository.existsById(dto.getPaymentTypeId())) {
-                PaymentType paymentType = paymentTypeRepository.findById(dto.getPaymentTypeId()).get();
-                order.setPaymentType(paymentType);
-            } else {
-                throw new Exception("El tipo de pago no existe");
-            }
-        }
-
-        //Order Status
-        if (dto.getOrderStatusId() != null) {
-            if (orderStatusRepository.existsById(dto.getOrderStatusId())) {
-                OrderStatus orderStatus = orderStatusRepository.findById(dto.getOrderStatusId()).get();
-                order.setOrderStatus(orderStatus);
-            } else {
-                throw new Exception("El estado de orden no existe");
-            }
-        }
-
-        Orders saveOrder = ordersRepository.save(order);
-
-        //Order Date
-        saveOrder.setOrderDate(LocalDateTime.now());
-
-        //Estimated Time init
-        int orderPrepTime = 0;
-
-        //Order Detail
-        OrderDetail orderDetail;
-        for (OrderDetailDTO orderDetailDTO : dto.getOrderDetails()){
-            orderDetail = orderDetailMapper.toEntity(orderDetailDTO);
-
-            //Item
-            Item item = null;
-            if(orderDetailDTO.getItemId() != null && itemRepository.existsById(orderDetailDTO.getItemId())){
-                item = itemRepository.findById(orderDetailDTO.getItemId()).get();
-            } else {
-                throw new Exception("Item invalido o no existente");
+            //Customer
+            if (dto.getCustomerId() != null) {
+                if (customerRepository.existsById(dto.getCustomerId())) {
+                    Customer customer = customerRepository.findById(dto.getCustomerId()).get();
+                    order.setCustomer(customer);
+                } else {
+                    throw new Exception("El cliente no existe");
+                }
             }
 
-            //Prep Time & Stock update
-            //Food
-            if (item.getItemType().getId() == 2){
-                Recipe recipe = recipeRepository.findByItemId(item.getId());
-                Integer itemPrepTime = recipe.getPreparationTime();
+            //Delivery Type
+            if (dto.getDeliveryTypeId() != null) {
+                if (deliveryTypeRepository.existsById(dto.getDeliveryTypeId())) {
+                    DeliveryType deliveryType = deliveryTypeRepository.findById(dto.getDeliveryTypeId()).get();
+                    order.setDeliveryType(deliveryType);
+                } else {
+                    throw new Exception("El tipo de delivery no existe");
+                }
+            }
 
-                //Get Max prepTime inside orderDetail
-                if(itemPrepTime > orderPrepTime) {
-                    orderPrepTime = itemPrepTime;
+            //PaymentType
+            if (dto.getPaymentTypeId() != null) {
+                if (paymentTypeRepository.existsById(dto.getPaymentTypeId())) {
+                    PaymentType paymentType = paymentTypeRepository.findById(dto.getPaymentTypeId()).get();
+                    order.setPaymentType(paymentType);
+                } else {
+                    throw new Exception("El tipo de pago no existe");
+                }
+            }
+
+            //Order Status
+            if (dto.getOrderStatusId() != null) {
+                if (orderStatusRepository.existsById(dto.getOrderStatusId())) {
+                    OrderStatus orderStatus = orderStatusRepository.findById(dto.getOrderStatusId()).get();
+                    order.setOrderStatus(orderStatus);
+                } else {
+                    throw new Exception("El estado de orden no existe");
+                }
+            }
+
+            Orders saveOrder = ordersRepository.save(order);
+
+            //Order Date
+            saveOrder.setOrderDate(LocalDateTime.now());
+
+            //Estimated Time init
+            int orderPrepTime = 0;
+
+            //Order Detail
+            OrderDetail orderDetail;
+            for (OrderDetailDTO orderDetailDTO : dto.getOrderDetails()){
+                orderDetail = orderDetailMapper.toEntity(orderDetailDTO);
+
+                //Item
+                Item item = null;
+                if(orderDetailDTO.getItemId() != null && itemRepository.existsById(orderDetailDTO.getItemId())){
+                    item = itemRepository.findById(orderDetailDTO.getItemId()).get();
+                } else {
+                    throw new Exception("Item invalido o no existente");
                 }
 
-                //New Stock for Food products
-                for (RecipeDetail recipeDetail: recipe.getRecipeDetails()) {
+                //Prep Time & Stock update
+                //Food
+                if (item.getItemType().getId() == 2){
+                    Recipe recipe = recipeRepository.findByItemId(item.getId());
+                    Integer itemPrepTime = recipe.getPreparationTime();
 
-                    int totalQuantityUsed = recipeDetail.getQuantity() * orderDetail.getQuantity();
-                    ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(recipeDetail.getItem().getId());
+                    //Get Max prepTime inside orderDetail
+                    if(itemPrepTime > orderPrepTime) {
+                        orderPrepTime = itemPrepTime;
+                    }
+
+                    //New Stock for Food products
+                    for (RecipeDetail recipeDetail: recipe.getRecipeDetails()) {
+
+                        int totalQuantityUsed = recipeDetail.getQuantity() * orderDetail.getQuantity();
+
+                        ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(recipeDetail.getItem().getId());
+
+                        // Subtract "-"
+                        int newCurrentStock = latestItemCurrentStock.getCurrentStock() - totalQuantityUsed;
+
+                        if (newCurrentStock != latestItemCurrentStock.getCurrentStock()) {
+                            ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
+                            newItemCurrentStock.setCurrentStock(newCurrentStock);
+                            newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
+                            newItemCurrentStock.setItem(recipeDetail.getItem());
+                            itemCurrentStockRepository.save(newItemCurrentStock);
+
+                            eventPublisher.publishEvent(new StockChangeEvent(this, recipeDetail.getItem().getId()));
+                        }
+                    }
+
+                    //Drinks
+                } else {
+
+                    ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
+                    int totalQuantityUsed = orderDetail.getQuantity();
 
                     // Subtract "-"
                     int newCurrentStock = latestItemCurrentStock.getCurrentStock() - totalQuantityUsed;
@@ -284,75 +306,57 @@ public class OrdersServiceImpl extends GenericServiceImpl<Orders, OrdersDTO,Long
                         ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
                         newItemCurrentStock.setCurrentStock(newCurrentStock);
                         newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
-                        newItemCurrentStock.setItem(recipeDetail.getItem());
+                        newItemCurrentStock.setItem(item);
                         itemCurrentStockRepository.save(newItemCurrentStock);
-
-                        eventPublisher.publishEvent(new StockChangeEvent(this, recipeDetail.getItem().getId()));
                     }
-
                 }
 
-                //Drinks
-            } else {
+                //Item on Details
+                orderDetail.setItem(item);
 
-                ItemCurrentStock latestItemCurrentStock = itemCurrentStockRepository.findLatestByItemId(item.getId());
-                int totalQuantityUsed = orderDetail.getQuantity();
+                //Order on OrderDetails
+                orderDetail.setOrder(saveOrder);
 
-                // Subtract "-"
-                int newCurrentStock = latestItemCurrentStock.getCurrentStock() - totalQuantityUsed;
-
-                if (newCurrentStock != latestItemCurrentStock.getCurrentStock()) {
-                    ItemCurrentStock newItemCurrentStock = new ItemCurrentStock();
-                    newItemCurrentStock.setCurrentStock(newCurrentStock);
-                    newItemCurrentStock.setCurrentStockDate(LocalDateTime.now());
-                    newItemCurrentStock.setItem(item);
-                    itemCurrentStockRepository.save(newItemCurrentStock);
-                }
+                //Save OrderDetail
+                orderDetailRepository.save(orderDetail);
             }
 
-            //Item on Details
-            orderDetail.setItem(item);
+            //Get all orders on kitchen
+            List<Orders> ordersKitchen = ordersRepository.findAllByOrderStatusId(2L);
+            int ordersOnKitchenPrepTime = 0;
+            for (Orders ordKit: ordersKitchen) {
+                ordersOnKitchenPrepTime += ordKit.getEstimatedTime();
+            }
 
-            //Order on OrderDetails
-            orderDetail.setOrder(saveOrder);
+            //Get all Cooks who are working now
+            List<Customer> cooksList = customerRepository.findAllLoggedCocinero();
+            int cooks = 0;
 
-            //Save OrderDetail
-            orderDetailRepository.save(orderDetail);
+            //Avoid dividing by 0
+            if (!cooksList.isEmpty()) {
+                cooks = cooksList.size();
+            } else {
+                cooks = 1;
+            }
+
+            //Calculation of Estimated Time of the order
+            orderPrepTime = (orderPrepTime + (ordersOnKitchenPrepTime / cooks));
+
+            //Delivery
+            if (saveOrder.getDeliveryType().getId() == 1){
+                orderPrepTime += 10;
+            }
+
+            //Estimated Time
+            saveOrder.setEstimatedTime(orderPrepTime);
+
+            //Update order with Estimated Time
+            saveOrder = ordersRepository.save(saveOrder);
+
+            return saveOrder;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
-
-        //Get all orders on kitchen
-        List<Orders> ordersKitchen = ordersRepository.findAllByOrderStatusId(2L);
-        int ordersOnKitchenPrepTime = 0;
-        for (Orders ordKit: ordersKitchen) {
-            ordersOnKitchenPrepTime += ordKit.getEstimatedTime();
-        }
-
-        //Get all Cooks who are working now
-        List<Customer> cooksList = customerRepository.findAllLoggedCocinero();
-        int cooks = 0;
-
-        //Avoid dividing by 0
-        if (!cooksList.isEmpty()) {
-            cooks = cooksList.size();
-        } else {
-            cooks = 1;
-        }
-
-        //Calculation of Estimated Time of the order
-        orderPrepTime = (orderPrepTime + (ordersOnKitchenPrepTime / cooks));
-
-        //Delivery
-        if (saveOrder.getDeliveryType().getId() == 1){
-            orderPrepTime += 10;
-        }
-
-        //Estimated Time
-        saveOrder.setEstimatedTime(orderPrepTime);
-
-        //Update order with Estimated Time
-        saveOrder = ordersRepository.save(saveOrder);
-
-        return saveOrder;
     }
 
     @Override
